@@ -1,0 +1,16 @@
+### GET status
+GET http://localhost:3000/status
+
+### GET blocks
+GET http://localhost:3000/blocks/0
+
+### POST block
+POST http://localhost:3000/blocks
+content-type: application/json
+
+{
+    "hash": "",
+    "index": 2,
+    "data": "Block 3",
+    "previousHash": "1870d225593655ee12b3db4c6b38d6e4260a7d3283d009d5437e3fcfc9a6a373"
+}
