@@ -12,7 +12,13 @@ export default class Blockchain {
    * Creates a new blockchain
    */
   constructor() {
-    this.blocks = [new Block(this.nextIndex, "", "Genesis Block")];
+    this.blocks = [
+      new Block({
+        index: this.nextIndex,
+        previousHash: "",
+        data: "Genesis Block",
+      } as Block),
+    ];
     this.nextIndex++;
   }
 
@@ -31,6 +37,10 @@ export default class Blockchain {
     this.nextIndex++;
 
     return new Validation();
+  }
+
+  getBlock(hash: string): Block | undefined {
+    return this.blocks.find((b) => b.hash === hash);
   }
 
   isValid(): Validation {
