@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     coverage: {
-      include: ["src/lib/**/*.ts"],
+      include: ["src/{lib,server}/**/*.ts"],
       reporter: ["text", "lcov"],
     },
     clearMocks: true,
