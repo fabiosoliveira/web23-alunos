@@ -1,6 +1,8 @@
 import { describe, expect, test, vi } from "vitest";
 import Blockchain from "../src/lib/Blockchain";
-import Block from "./__mocks__/Block";
+import Block from "../src/lib/Block";
+
+vi.mock("../src/lib/Block");
 
 describe("Blockchain tests", () => {
   test("Shuld has genesis blocks", () => {
@@ -66,5 +68,11 @@ describe("Blockchain tests", () => {
       } as Block)
     );
     expect(result.success).toEqual(false);
+  });
+
+  test("Shuld get next block info", () => {
+    const blockchain = new Blockchain();
+    const info = blockchain.getNextBlock();
+    expect(info.index).toEqual(1);
   });
 });

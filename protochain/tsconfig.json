@@ -108,6 +108,7 @@
   },
   "exclude": [
     "__test__",
+    "__mocks__",
     "vite.config.ts"
   ]
 }

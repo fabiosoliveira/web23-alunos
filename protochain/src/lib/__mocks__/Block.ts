@@ -1,4 +1,5 @@
-import Validation from "../../src/lib/Validation";
+import Validation from "../Validation";
+
 /**
  * Mocked Block class
  */
@@ -8,6 +9,8 @@ export default class Block {
   hash: string;
   previousHash: string;
   data: string;
+  nonce: number;
+  miner: string;
 
   /**
    * Creates a new mock block
@@ -18,6 +21,8 @@ export default class Block {
     this.timestamp = block?.timestamp || Date.now();
     this.previousHash = block?.previousHash || "";
     this.data = block?.data || "";
+    this.nonce = block?.nonce || 0;
+    this.miner = block?.miner || "";
     this.hash = block?.hash || this.getHash();
   }
 

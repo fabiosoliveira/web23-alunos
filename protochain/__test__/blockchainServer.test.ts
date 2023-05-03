@@ -1,7 +1,10 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import request from "supertest";
 import { app } from "../src/server/blockchainServer";
-import Block from "./__mocks__/Block";
+import Block from "../src/lib/Block";
+
+vi.mock("../src/lib/Block");
+vi.mock("../src/lib/Blockchain");
 
 describe("BlockchainServer tests", () => {
   test("GET /status - Should return status", async () => {
@@ -29,6 +32,13 @@ describe("BlockchainServer tests", () => {
     const response = await request(app).get("/blocks/-1");
 
     expect(response.status).toEqual(404);
+  });
+
+  test("GET /blocks/next - Shuld get next block info", async () => {
+    const response = await request(app).get("/blocks/next");
+
+    expect(response.status).toEqual(200);
+    expect(response.body.index).toEqual(1);
   });
 
   test("POST /blocks/ - Shuld add block", async () => {

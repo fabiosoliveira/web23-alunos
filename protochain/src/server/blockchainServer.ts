@@ -1,20 +1,25 @@
-import express from "express";
+import dotenv from "dotenv";
+dotenv.config();
+
+import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import Blockchain from "../lib/Blockchain";
 import Block from "../lib/Block";
 
-const PORT = 3000;
+/* c8 ignore next */
+const PORT = process.env.BLOCKCHAIN_PORT || 3000;
 
 const app = express();
-
+/* c8 ignore next 3 */
 if (process.argv.includes("--run")) {
   app.use(morgan("tiny"));
 }
+
 app.use(express.json());
 
 const blockchain = new Blockchain();
 
-app.get("/status", (req, res, next) => {
+app.get("/status", (req: Request, res: Response, next: NextFunction) => {
   res.json({
     numberOfBlocks: blockchain.blocks.length,
     isValid: blockchain.isValid(),
@@ -22,19 +27,26 @@ app.get("/status", (req, res, next) => {
   });
 });
 
-app.get("/blocks/:indexOrHash", (req, res, next) => {
-  let block;
-  if (/^[0-9]+$/.test(req.params.indexOrHash)) {
-    block = blockchain.blocks[parseInt(req.params.indexOrHash)];
-  } else {
-    block = blockchain.getBlock(req.params.indexOrHash);
-  }
-
-  if (!block) return res.sendStatus(404);
-  else return res.json(block);
+app.get("/blocks/next", (req: Request, res: Response, next: NextFunction) => {
+  res.json(blockchain.getNextBlock());
 });
 
-app.post("/blocks", (req, res, next) => {
+app.get(
+  "/blocks/:indexOrHash",
+  (req: Request, res: Response, next: NextFunction) => {
+    let block;
+    if (/^[0-9]+$/.test(req.params.indexOrHash)) {
+      block = blockchain.blocks[parseInt(req.params.indexOrHash)];
+    } else {
+      block = blockchain.getBlock(req.params.indexOrHash);
+    }
+
+    if (!block) return res.sendStatus(404);
+    else return res.json(block);
+  }
+);
+
+app.post("/blocks", (req: Request, res: Response, next: NextFunction) => {
   if (req.body.hash === undefined) return res.sendStatus(422);
 
   const block = new Block(req.body as Block);
@@ -47,6 +59,7 @@ app.post("/blocks", (req, res, next) => {
   }
 });
 
+/* c8 ignore next 5 */
 if (process.argv.includes("--run")) {
   app.listen(PORT, () => {
     console.log(`Blockchain server is running as ${PORT}`);
