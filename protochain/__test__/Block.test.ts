@@ -1,6 +1,10 @@
-import { beforeAll, describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test, vi } from "vitest";
 import Block from "../src/lib/Block";
 import BlockInfo from "../src/lib/BlockInfo";
+import Transaction from "../src/lib/Transaction";
+import TransactionType from "../src/lib/TransactionType";
+
+vi.mock("../src/lib/Transaction");
 
 describe("Block tests", () => {
   const exempleDifficulty = 0;
@@ -9,7 +13,11 @@ describe("Block tests", () => {
 
   beforeAll(() => {
     genesis = new Block({
-      data: "Genesis Block",
+      transactions: [
+        new Transaction({
+          data: "Genesis block",
+        } as Transaction),
+      ],
     } as Block);
   });
 
@@ -17,7 +25,11 @@ describe("Block tests", () => {
     const block = new Block({
       index: 1,
       previousHash: genesis.hash,
-      data: "block 2",
+      transactions: [
+        new Transaction({
+          data: "block 2",
+        } as Transaction),
+      ],
     } as Block);
 
     block.mine(exempleDifficulty, exempleMiner);
@@ -28,7 +40,11 @@ describe("Block tests", () => {
 
   test("Shuld create from block info", () => {
     const block = Block.fromBlockInfo({
-      data: "block 2",
+      transactions: [
+        new Transaction({
+          data: "block 2",
+        } as Transaction),
+      ],
       difficulty: exempleDifficulty,
       feePerTx: 1,
       index: 1,
@@ -42,6 +58,41 @@ describe("Block tests", () => {
     expect(valid.success).toBeTruthy();
   });
 
+  test("Shuld not be valid (2 FEE)", () => {
+    const block = new Block({
+      index: 1,
+      previousHash: genesis.hash,
+      transactions: [
+        new Transaction({
+          type: TransactionType.FEE,
+          data: "fee 1",
+        } as Transaction),
+        new Transaction({
+          type: TransactionType.FEE,
+          data: "fee 2",
+        } as Transaction),
+      ],
+    } as Block);
+
+    block.mine(exempleDifficulty, exempleMiner);
+
+    const valid = block.isValid(genesis.hash, genesis.index, exempleDifficulty);
+    expect(valid.success).toBeFalsy();
+  });
+
+  test("Shuld not be valid (invalid tx)", () => {
+    const block = new Block({
+      index: 1,
+      previousHash: genesis.hash,
+      transactions: [new Transaction()],
+    } as Block);
+
+    block.mine(exempleDifficulty, exempleMiner);
+
+    const valid = block.isValid(genesis.hash, genesis.index, exempleDifficulty);
+    expect(valid.success).toBeFalsy();
+  });
+
   test("Shuld not be valid (fallbacks)", () => {
     const block = new Block();
     const valid = block.isValid(genesis.hash, genesis.index, exempleDifficulty);
@@ -52,7 +103,11 @@ describe("Block tests", () => {
     const block = new Block({
       index: 1,
       previousHash: "abc",
-      data: "block 2",
+      transactions: [
+        new Transaction({
+          data: "block 2",
+        } as Transaction),
+      ],
     } as Block);
     const valid = block.isValid(genesis.hash, genesis.index, exempleDifficulty);
     expect(valid.success).toBeFalsy();
@@ -62,7 +117,11 @@ describe("Block tests", () => {
     const block = new Block({
       index: 1,
       previousHash: genesis.hash,
-      data: "block 2",
+      transactions: [
+        new Transaction({
+          data: "block 2",
+        } as Transaction),
+      ],
     } as Block);
     block.timestamp = -1;
     block.hash = block.getHash();
@@ -74,7 +133,11 @@ describe("Block tests", () => {
     const block = new Block({
       index: 1,
       previousHash: genesis.hash,
-      data: "block 2",
+      transactions: [
+        new Transaction({
+          data: "block 2",
+        } as Transaction),
+      ],
     } as Block);
 
     block.mine(exempleDifficulty, exempleMiner);
@@ -88,7 +151,11 @@ describe("Block tests", () => {
     const block = new Block({
       index: 1,
       previousHash: genesis.hash,
-      data: "block 2",
+      transactions: [
+        new Transaction({
+          data: "block 2",
+        } as Transaction),
+      ],
     } as Block);
 
     const valid = block.isValid(genesis.hash, genesis.index, exempleDifficulty);
@@ -99,7 +166,11 @@ describe("Block tests", () => {
     const block = new Block({
       index: 1,
       previousHash: genesis.hash,
-      data: "",
+      transactions: [
+        new Transaction({
+          data: "",
+        } as Transaction),
+      ],
     } as Block);
     const valid = block.isValid(genesis.hash, genesis.index, exempleDifficulty);
     expect(valid.success).toBeFalsy();
@@ -109,7 +180,11 @@ describe("Block tests", () => {
     const block = new Block({
       index: -1,
       previousHash: genesis.hash,
-      data: "block 2",
+      transactions: [
+        new Transaction({
+          data: "block 2",
+        } as Transaction),
+      ],
     } as Block);
     const valid = block.isValid(genesis.hash, genesis.index, exempleDifficulty);
     expect(valid.success).toBeFalsy();

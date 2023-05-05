@@ -2,9 +2,11 @@ import { describe, expect, test, vi } from "vitest";
 import request from "supertest";
 import { app } from "../src/server/blockchainServer";
 import Block from "../src/lib/Block";
+import Transaction from "../src/lib/Transaction";
 
 vi.mock("../src/lib/Block");
 vi.mock("../src/lib/Blockchain");
+vi.mock("../src/lib/Transaction");
 
 describe("BlockchainServer tests", () => {
   test("GET /status - Should return status", async () => {
@@ -60,5 +62,49 @@ describe("BlockchainServer tests", () => {
     const response = await request(app).post("/blocks/").send(block);
 
     expect(response.status).toEqual(400);
+  });
+
+  test("GET /transactions/:hash - Shuld get transaction abc", async () => {
+    const response = await request(app).get("/transactions/abc");
+
+    expect(response.status).toEqual(200);
+    expect(response.body.mempoolIndex).toEqual(0);
+  });
+
+  test("GET /transactions - Shuld get transactions", async () => {
+    const response = await request(app).get("/transactions");
+
+    expect(response.status).toEqual(200);
+    expect(response.body.total).toEqual(0);
+  });
+
+  test("POST /transactions/ - Shuld add tx", async () => {
+    const tx = new Transaction({
+      data: "tx1",
+    } as Transaction);
+
+    const response = await request(app).post("/transactions/").send(tx);
+
+    expect(response.status).toEqual(201);
+  });
+
+  test("POST /transactions/ - Shuld not add empty", async () => {
+    const tx = new Transaction({
+      data: "",
+    } as Transaction);
+
+    const response = await request(app).post("/transactions/").send(tx);
+
+    expect(response.status).toEqual(400);
+  });
+
+  test("POST /transactions/ - Shuld not add undefined hash", async () => {
+    const tx = {
+      data: "",
+    } as Transaction;
+
+    const response = await request(app).post("/transactions/").send(tx);
+
+    expect(response.status).toEqual(422);
   });
 });

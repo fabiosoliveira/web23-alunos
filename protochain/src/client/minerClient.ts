@@ -23,6 +23,13 @@ async function mine() {
 
   const { data: blockInfo } = await instance.get<BlockInfo>("/blocks/next");
 
+  if (!blockInfo) {
+    console.log("No tx found. Waiting...");
+    return setTimeout(() => {
+      mine();
+    }, 5000);
+  }
+
   const newBlock = Block.fromBlockInfo(blockInfo);
 
   //TODO: adicionar tx de recompensa
