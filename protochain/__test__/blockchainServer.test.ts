@@ -3,10 +3,12 @@ import request from "supertest";
 import { app } from "../src/server/blockchainServer";
 import Block from "../src/lib/Block";
 import Transaction from "../src/lib/Transaction";
+import TransactionInput from "../src/lib/TransactionInput";
 
 vi.mock("../src/lib/Block");
 vi.mock("../src/lib/Blockchain");
 vi.mock("../src/lib/Transaction");
+vi.mock("../src/lib/TransactionInput");
 
 describe("BlockchainServer tests", () => {
   test("GET /status - Should return status", async () => {
@@ -80,7 +82,8 @@ describe("BlockchainServer tests", () => {
 
   test("POST /transactions/ - Shuld add tx", async () => {
     const tx = new Transaction({
-      data: "tx1",
+      txInput: new TransactionInput(),
+      to: "carteiraTo",
     } as Transaction);
 
     const response = await request(app).post("/transactions/").send(tx);
@@ -89,8 +92,11 @@ describe("BlockchainServer tests", () => {
   });
 
   test("POST /transactions/ - Shuld not add empty", async () => {
+    const txInput = new TransactionInput();
+    txInput.amount = -1;
+
     const tx = new Transaction({
-      data: "",
+      txInput,
     } as Transaction);
 
     const response = await request(app).post("/transactions/").send(tx);
@@ -99,8 +105,11 @@ describe("BlockchainServer tests", () => {
   });
 
   test("POST /transactions/ - Shuld not add undefined hash", async () => {
+    const txInput = new TransactionInput();
+    txInput.amount = -1;
+
     const tx = {
-      data: "",
+      txInput,
     } as Transaction;
 
     const response = await request(app).post("/transactions/").send(tx);

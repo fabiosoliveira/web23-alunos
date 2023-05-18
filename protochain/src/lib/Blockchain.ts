@@ -1,6 +1,7 @@
 import Block from "./Block";
 import BlockInfo from "./BlockInfo";
 import Transaction from "./Transaction";
+import TransactionInput from "./TransactionInput";
 import TransactionSearch from "./TransactionSearch";
 import TransactionType from "./TransactionType";
 import Validation from "./Validation";
@@ -28,7 +29,7 @@ export default class Blockchain {
         transactions: [
           new Transaction({
             type: TransactionType.FEE,
-            data: new Date().toString(),
+            txInput: new TransactionInput(),
           } as Transaction),
         ],
       } as Block),
@@ -41,10 +42,22 @@ export default class Blockchain {
   }
 
   getDifficulty(): number {
-    return Math.ceil(this.blocks.length / Blockchain.DIFFICULTY_FACTOR);
+    return Math.ceil(this.blocks.length / Blockchain.DIFFICULTY_FACTOR) + 1;
   }
 
   addTransaction(transaction: Transaction): Validation {
+    if (transaction.txInput) {
+      const from = transaction.txInput.fromAddress;
+      const pendingTx = this.mempool
+        .map((tx) => tx.txInput)
+        .filter((tx) => tx!.fromAddress === from);
+      if (pendingTx && pendingTx.length) {
+        return new Validation(false, `This wallet has a pending transaction.`);
+      }
+
+      //TODO: validar a origem dos fundos
+    }
+
     const validation = transaction.isValid();
     if (!validation.success)
       return new Validation(false, `Invalid tx: ${validation.message}`);
@@ -55,9 +68,6 @@ export default class Blockchain {
       )
     )
       return new Validation(false, `Duplicated tx in blockchain.`);
-
-    if (this.mempool.some((tx) => tx.hash === transaction.hash))
-      return new Validation(false, `Duplicated tx in mempool.`);
 
     this.mempool.push(transaction);
     return new Validation(true, transaction.hash);

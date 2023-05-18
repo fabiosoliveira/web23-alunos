@@ -4,6 +4,7 @@ import Validation from "../Validation";
 import Block from "./Block";
 import TransactionType from "../TransactionType";
 import TransactionSearch from "../TransactionSearch";
+import TransactionInput from "./TransactionInput";
 
 /**
  * Blockchain mock class
@@ -26,7 +27,7 @@ export default class Blockchain {
         transactions: [
           new Transaction({
             type: TransactionType.FEE,
-            data: "tx1",
+            txInput: new TransactionInput(),
           } as Transaction),
         ],
         timestamp: Date.now(),
@@ -76,10 +77,10 @@ export default class Blockchain {
     return {
       transactions: [
         new Transaction({
-          data: new Date().toString(),
+          txInput: new TransactionInput(),
         } as Transaction),
       ],
-      difficulty: 0,
+      difficulty: 1,
       previousHash: this.getLastBlock().hash,
       index: 1,
       feePerTx: this.getFeePerTx(),
