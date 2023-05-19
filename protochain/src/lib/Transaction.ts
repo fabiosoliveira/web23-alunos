@@ -73,9 +73,11 @@ export default class Transaction {
       const inputSum = this.txInputs
         .map((txInput) => txInput.amount)
         .reduce((a, b) => a + b, 0);
+
       const outputSum = this.txOutputs
         .map((txOutput) => txOutput.amount)
         .reduce((a, b) => a + b, 0);
+
       if (inputSum < outputSum) {
         return new Validation(
           false,

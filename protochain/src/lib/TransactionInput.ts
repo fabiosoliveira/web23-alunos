@@ -12,12 +12,14 @@ export default class TransactionInput {
   fromAddress: string;
   amount: number;
   signature: string;
+  previousTx: string;
 
   /**
    * Creates a new TransactionInput
    * @param txInput The tx input data
    * */
   constructor(txInput?: TransactionInput) {
+    this.previousTx = txInput?.previousTx || "";
     this.fromAddress = txInput?.fromAddress || "";
     this.amount = txInput?.amount || 0;
     this.signature = txInput?.signature || "";
@@ -41,7 +43,7 @@ export default class TransactionInput {
    * @return {string} The hash of the transaction data.
    */
   getHash(): string {
-    const data = this.fromAddress + this.amount;
+    const data = this.previousTx + this.fromAddress + this.amount;
     const hash = crypto.createHash("sha256").update(data).digest("hex");
     return hash;
   }
@@ -54,7 +56,8 @@ export default class TransactionInput {
    *                      Otherwise, it will contain a message describing the validation failure.
    */
   isValid(): Validation {
-    if (!this.signature) return new Validation(false, "Signature is required.");
+    if (!this.previousTx || !this.signature)
+      return new Validation(false, "Signature and previous Tx are required.");
 
     if (this.amount < 1)
       return new Validation(false, "Amount must be greater than zero.");

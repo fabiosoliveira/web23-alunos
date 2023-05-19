@@ -6,6 +6,7 @@ import morgan from "morgan";
 import Blockchain from "../lib/Blockchain";
 import Block from "../lib/Block";
 import Transaction from "../lib/Transaction";
+import Wallet from "../lib/Wallet";
 
 /* c8 ignore next */
 const PORT = process.env.BLOCKCHAIN_PORT || 3000;
@@ -18,7 +19,9 @@ if (process.argv.includes("--run")) {
 
 app.use(express.json());
 
-const blockchain = new Blockchain();
+const wallet = new Wallet(process.env.BLOCKCHAIN_WALLET);
+
+const blockchain = new Blockchain(wallet.publicKey);
 
 app.get("/status", (req: Request, res: Response, next: NextFunction) => {
   res.json({
