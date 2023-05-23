@@ -1,10 +1,12 @@
 import Block from "./Block";
 import BlockInfo from "./BlockInfo";
 import Transaction from "./Transaction";
+import TransactionInput from "./TransactionInput";
 import TransactionOutput from "./TransactionOutput";
 import TransactionSearch from "./TransactionSearch";
 import TransactionType from "./TransactionType";
 import Validation from "./Validation";
+import Wallet from "./Wallet";
 
 /**
  * Blockchain class
@@ -74,8 +76,24 @@ export default class Blockchain {
         return new Validation(false, `This wallet has a pending transaction.`);
       }
 
-      //TODO: validar a origem dos fundos (UTXO)
+      const utxo = this.getUtxo(from);
+
+      for (let i = 0; i < transaction.txInputs.length; i++) {
+        const txi = transaction.txInputs[i];
+        if (
+          utxo.findIndex(
+            (txo) => txo.tx === txi.previousTx && txo.amount >= txi.amount
+          ) === -1
+        ) {
+          return new Validation(
+            false,
+            `Invalid tx: the TXO is already spent or unexistent.`
+          );
+        }
+      }
     }
+
+    //TODO: fazer versão final que valida as taxas
 
     const validation = transaction.isValid();
     if (!validation.success)
@@ -183,5 +201,47 @@ export default class Blockchain {
       feePerTx: this.getFeePerTx(),
       maxDifficulty: Blockchain.MAX_DIFFICULTY,
     };
+  }
+
+  getTxInputs(wallet: string): (TransactionInput | undefined)[] {
+    return this.blocks
+      .map((b) => b.transactions)
+      .flat()
+      .filter((tx) => tx.txInputs && tx.txInputs.length)
+      .map((tx) => tx.txInputs)
+      .flat()
+      .filter((txi) => txi!.fromAddress === wallet);
+  }
+
+  getTxOutputs(wallet: string): TransactionOutput[] {
+    return this.blocks
+      .map((b) => b.transactions)
+      .flat()
+      .filter((tx) => tx.txOutputs && tx.txOutputs.length)
+      .map((tx) => tx.txOutputs)
+      .flat()
+      .filter((txo) => txo.toAddress === wallet);
+  }
+
+  getUtxo(wallet: string): TransactionOutput[] {
+    const txIns = this.getTxInputs(wallet);
+    const txOuts = this.getTxOutputs(wallet);
+
+    if (!txIns || !txIns.length) return txOuts;
+
+    txIns.forEach((txi) => {
+      const index = txOuts.findIndex((txo) => txo.amount === txi!.amount);
+      txOuts.splice(index, 1);
+    });
+
+    return txOuts;
+  }
+
+  getBalance(wallet: string): number {
+    const utxo = this.getUtxo(wallet);
+
+    if (!utxo || !utxo.length) return 0;
+
+    return utxo.reduce((acc, txo) => acc + txo.amount, 0);
   }
 }
