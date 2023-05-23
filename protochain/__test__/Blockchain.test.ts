@@ -4,6 +4,8 @@ import Block from "../src/lib/Block";
 import Transaction from "../src/lib/Transaction";
 import TransactionInput from "../src/lib/TransactionInput";
 import Wallet from "../src/lib/Wallet";
+import TransactionType from "../src/lib/TransactionType";
+import TransactionOutput from "../src/lib/TransactionOutput";
 
 vi.mock("../src/lib/Block");
 vi.mock("../src/lib/Transaction");
@@ -186,25 +188,55 @@ describe("Blockchain tests", () => {
     expect(result.success).toEqual(true);
   });
 
+  test("Shuld not add block (invalid mempool)", () => {
+    const blockchain = new Blockchain(alice.publicKey);
+    blockchain.mempool.push(new Transaction());
+    blockchain.mempool.push(new Transaction());
+
+    const tx = new Transaction({
+      txInputs: [new TransactionInput()],
+    } as Transaction);
+
+    const result = blockchain.addBlock(
+      new Block({
+        index: 1,
+        previousHash: blockchain.blocks[0].hash,
+        transactions: [tx],
+      } as Block)
+    );
+    expect(result.success).toBeFalsy();
+  });
+
   test("Shuld get block", () => {
     const blockchain = new Blockchain(alice.publicKey);
     const block = blockchain.getBlock(blockchain.blocks[0].hash);
     expect(block).toBeTruthy();
   });
 
-  test("Shuld not add block", () => {
+  test("Shuld not add block (invalid index)", () => {
     const blockchain = new Blockchain(alice.publicKey);
-    const result = blockchain.addBlock(
-      new Block({
-        index: -1,
-        previousHash: blockchain.blocks[0].hash,
-        transactions: [
-          new Transaction({
-            txInputs: [new TransactionInput()],
-          } as Transaction),
+    blockchain.mempool.push(new Transaction());
+
+    const block = new Block({
+      index: -1,
+      previousHash: blockchain.blocks[0].hash,
+    } as Block);
+
+    block.transactions.push(
+      new Transaction({
+        type: TransactionType.FEE,
+        txOutputs: [
+          new TransactionOutput({
+            toAddress: alice.publicKey,
+            amount: 1,
+          } as TransactionOutput),
         ],
-      } as Block)
+      } as Transaction)
     );
+
+    block.hash = block.getHash();
+
+    const result = blockchain.addBlock(block);
     expect(result.success).toEqual(false);
   });
 

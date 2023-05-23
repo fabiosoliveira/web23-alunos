@@ -113,7 +113,7 @@ app.get(
   }
 );
 
-/* c8 ignore next 5 */
+/* c8 ignore next 7 */
 if (process.argv.includes("--run")) {
   app.listen(PORT, () => {
     console.log(

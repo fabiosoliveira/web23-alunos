@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import request from "supertest";
 import { app } from "../src/server/blockchainServer";
 import Block from "../src/lib/Block";
@@ -75,12 +75,12 @@ describe("BlockchainServer tests", () => {
     expect(response.body.mempoolIndex).toEqual(0);
   });
 
-  // test("GET /transactions - Shuld get transactions", async () => {
-  //   const response = await request(app).get("/transactions");
+  test("GET /transactions - Shuld get transactions", async () => {
+    const response = await request(app).get("/transactions");
 
-  //   expect(response.status).toEqual(200);
-  //   expect(response.body.total).toEqual(0);
-  // });
+    expect(response.status).toEqual(200);
+    expect(response.body.total).toEqual(1);
+  });
 
   test("POST /transactions/ - Shuld add tx", async () => {
     const tx = new Transaction({
@@ -93,29 +93,17 @@ describe("BlockchainServer tests", () => {
     expect(response.status).toEqual(201);
   });
 
-  // test("POST /transactions/ - Shuld not add empty", async () => {
-  //   const txInputs = [new TransactionInput()];
-  //   txInputs[0].amount = -1;
+  test("POST /transactions/ - Shuld not add empty", async () => {
+    const tx = new Transaction({
+      txInputs: [new TransactionInput()],
+      hash: "xyz",
+      timestamp: -1,
+    } as Transaction);
 
-  //   const tx = new Transaction({
-  //     txInputs,
-  //   } as Transaction);
+    const response = await request(app).post("/transactions/").send(tx);
 
-  //   const response = await request(app).post("/transactions/").send(tx);
+    console.log(response.status);
 
-  //   expect(response.status).toEqual(400);
-  // });
-
-  // test("POST /transactions/ - Shuld not add undefined hash", async () => {
-  //   const txInputs = [new TransactionInput()];
-  //   txInputs[0].amount = -1;
-
-  //   const tx = {
-  //     txInputs,
-  //   } as Transaction;
-
-  //   const response = await request(app).post("/transactions/").send(tx);
-
-  //   expect(response.status).toEqual(422);
-  // });
+    expect(response.status).toEqual(400);
+  });
 });
