@@ -7,6 +7,7 @@ import Blockchain from "../lib/Blockchain";
 import Block from "../lib/Block";
 import Transaction from "../lib/Transaction";
 import Wallet from "../lib/Wallet";
+import TransactionOutput from "../lib/TransactionOutput";
 
 /* c8 ignore next */
 const PORT = process.env.BLOCKCHAIN_PORT || 3000;
@@ -92,10 +93,32 @@ app.post("/transactions", (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+app.get(
+  "/wallets/:wallet",
+  (req: Request, res: Response, next: NextFunction) => {
+    const wallet = req.params.wallet;
+
+    //TODO: fazer versão final de UTXO
+    return res.json({
+      balance: 10,
+      fee: blockchain.getFeePerTx(),
+      utxo: [
+        new TransactionOutput({
+          toAddress: wallet,
+          amount: 10,
+          tx: "abc",
+        } as TransactionOutput),
+      ],
+    });
+  }
+);
+
 /* c8 ignore next 5 */
 if (process.argv.includes("--run")) {
   app.listen(PORT, () => {
-    console.log(`Blockchain server is running as ${PORT}`);
+    console.log(
+      `Blockchain server is running as ${PORT}. Wallet: ${wallet.publicKey}`
+    );
   });
 }
 

@@ -28,9 +28,9 @@ export default class Transaction {
 
     this.hash = tx?.hash || this.getHash();
 
-    this.txOutputs.forEach(
-      (txOutput, index, arr) => (arr[index].tx = this.hash)
-    );
+    this.txOutputs.forEach((txo, index, arr) => {
+      arr[index].tx = this.hash;
+    });
   }
 
   getHash(): string {
@@ -56,7 +56,7 @@ export default class Transaction {
 
     if (
       !this.txOutputs ||
-      this.txOutputs.length ||
+      !this.txOutputs.length ||
       this.txOutputs.map((txo) => txo.isValid()).some((v) => !v.success)
     )
       return new Validation(false, "Invalid TXO.");
@@ -81,7 +81,7 @@ export default class Transaction {
       if (inputSum < outputSum) {
         return new Validation(
           false,
-          "Invalid tx: input amounts must be equals or grater than output amounts."
+          "Invalid tx: input amounts must be equals or greater than output amounts."
         );
       }
     }

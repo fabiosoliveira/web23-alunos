@@ -2,9 +2,7 @@ import BlockInfo from "../BlockInfo";
 import Transaction from "./Transaction";
 import Validation from "../Validation";
 import Block from "./Block";
-import TransactionType from "../TransactionType";
 import TransactionSearch from "../TransactionSearch";
-import TransactionInput from "./TransactionInput";
 
 /**
  * Blockchain mock class

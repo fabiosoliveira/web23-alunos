@@ -24,7 +24,7 @@ export default class TransactionOutput {
   }
 
   getHash(): string {
-    const data = this.toAddress + this.amount + this.tx;
+    const data = this.toAddress + this.amount;
 
     const hash = crypto.createHash("sha256").update(data).digest("hex");
     return hash;

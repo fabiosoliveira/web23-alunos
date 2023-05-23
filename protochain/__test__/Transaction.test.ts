@@ -2,14 +2,16 @@ import { describe, expect, test, vi } from "vitest";
 import Transaction from "../src/lib/Transaction";
 import TransactionType from "../src/lib/TransactionType";
 import TransactionInput from "../src/lib/TransactionInput";
+import TransactionOutput from "../src/lib/TransactionOutput";
 
 vi.mock("../src/lib/TransactionInput");
+vi.mock("../src/lib/TransactionOutput");
 
 describe("Transactions tests", () => {
   test("Shuld be valid (REGULAR default)", () => {
     const tx = new Transaction({
-      txInput: new TransactionInput(),
-      to: "carteiraTo",
+      txInputs: [new TransactionInput()],
+      txOutputs: [new TransactionOutput()],
     } as Transaction);
 
     const valid = tx.isValid();
@@ -18,8 +20,8 @@ describe("Transactions tests", () => {
 
   test("Shuld not be valid (invalid hash)", () => {
     const tx = new Transaction({
-      txInput: new TransactionInput(),
-      to: "carteiraTo",
+      txInputs: [new TransactionInput()],
+      txOutputs: [new TransactionOutput()],
       type: TransactionType.REGULAR,
       timestamp: Date.now(),
       hash: "abc",
@@ -31,11 +33,11 @@ describe("Transactions tests", () => {
 
   test("Shuld be valid (FEE)", () => {
     const tx = new Transaction({
-      to: "carteiraTo",
+      txOutputs: [new TransactionOutput()],
       type: TransactionType.FEE,
     } as Transaction);
 
-    tx.txInput = undefined;
+    tx.txInputs = undefined;
     tx.hash = tx.getHash();
 
     const valid = tx.isValid();
@@ -46,17 +48,20 @@ describe("Transactions tests", () => {
     const tx = new Transaction();
 
     const valid = tx.isValid();
+
     expect(valid.success).toBeFalsy();
   });
 
   test("Shuld not be valid (invalid txInput)", () => {
     const tx = new Transaction({
-      txInput: new TransactionInput({
-        amount: -10,
-        fromAddress: "carteiraFrom",
-        signature: "abc",
-      } as TransactionInput),
-      to: "carteiraTo",
+      txOutputs: [new TransactionOutput()],
+      txInputs: [
+        new TransactionInput({
+          amount: -10,
+          fromAddress: "carteiraFrom",
+          signature: "abc",
+        } as TransactionInput),
+      ],
     } as Transaction);
 
     const valid = tx.isValid();
