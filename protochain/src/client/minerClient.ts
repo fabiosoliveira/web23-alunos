@@ -2,19 +2,16 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import axios from "axios";
-import BlockInfo from "../lib/BlockInfo";
 import Block from "../lib/Block";
+import BlockInfo from "../lib/BlockInfo";
 import Wallet from "../lib/Wallet";
 import Transaction from "../lib/Transaction";
 import TransactionOutput from "../lib/TransactionOutput";
 import Blockchain from "../lib/Blockchain";
 
-const instance = axios.create({
-  baseURL: process.env.BLOCKCHAIN_SERVER,
-});
+const BLOCKCHAIN_SERVER = process.env.BLOCKCHAIN_SERVER;
 
 const minerWallet = new Wallet(process.env.MINER_WALLET);
-
 console.log("Logged as " + minerWallet.publicKey);
 
 let totalMined = 0;
@@ -25,21 +22,21 @@ function getRewardTx(
 ): Transaction | undefined {
   let amount = 0;
 
-  if (blockInfo.difficulty <= blockInfo.maxDifficulty) {
+  if (blockInfo.difficulty <= blockInfo.maxDifficulty)
     amount += Blockchain.getRewardAmount(blockInfo.difficulty);
-  }
 
   const fees = nextBlock.transactions
     .map((tx) => tx.getFee())
-    .reduce((a, b) => a + b, 0);
+    .reduce((a, b) => a + b);
   const feeCheck = nextBlock.transactions.length * blockInfo.feePerTx;
   if (fees < feeCheck) {
-    console.log("Low fees. Awaiting next block...");
+    console.log("Low fees. Awaiting next block.");
     setTimeout(() => {
       mine();
     }, 5000);
     return;
   }
+
   amount += fees;
 
   const txo = new TransactionOutput({
@@ -52,15 +49,15 @@ function getRewardTx(
 
 async function mine() {
   console.log("Getting next block info...");
-
-  const { data: blockInfo } = await instance.get<BlockInfo>("/blocks/next");
-
-  if (!blockInfo) {
+  const { data } = await axios.get(`${BLOCKCHAIN_SERVER}blocks/next`);
+  if (!data) {
     console.log("No tx found. Waiting...");
     return setTimeout(() => {
       mine();
     }, 5000);
   }
+
+  const blockInfo = data as BlockInfo;
 
   const newBlock = Block.fromBlockInfo(blockInfo);
 
@@ -78,12 +75,12 @@ async function mine() {
   console.log("Block mined! Sending to blockchain...");
 
   try {
-    await instance.post("/blocks", newBlock);
+    await axios.post(`${BLOCKCHAIN_SERVER}blocks/`, newBlock);
     console.log("Block sent and accepted!");
     totalMined++;
-    console.log("Total mined block: ", totalMined);
-  } catch (error: any) {
-    console.error(error.response ? error.response.data : error.message);
+    console.log("Total mined blocks: " + totalMined);
+  } catch (err: any) {
+    console.error(err.response ? err.response.data : err.message);
   }
 
   setTimeout(() => {

@@ -2,7 +2,7 @@ import Transaction from "./Transaction";
 import Validation from "../Validation";
 
 /**
- * Mocked Block class
+ * Mocked block class
  */
 export default class Block {
   index: number;
@@ -20,7 +20,7 @@ export default class Block {
     this.index = block?.index || 0;
     this.timestamp = block?.timestamp || Date.now();
     this.previousHash = block?.previousHash || "";
-    this.transactions = block?.transactions || [];
+    this.transactions = block?.transactions || ([] as Transaction[]);
     this.miner = block?.miner || "abc";
     this.hash = block?.hash || this.getHash();
   }
@@ -35,16 +35,16 @@ export default class Block {
 
   /**
    * Validates the mock block
-   * @returns Returns true if the mock block is valid
+   * @returns Returns if the mock block is valid
    */
   isValid(
     previousHash: string,
     previousIndex: number,
     feePerTx: number
   ): Validation {
-    if ((!previousHash || previousIndex < 0 || this.index < 0, feePerTx < 1)) {
-      return new Validation(false, "Invalid mock block");
-    }
+    if (!previousHash || previousIndex < 0 || this.index < 0 || feePerTx < 1)
+      return new Validation(false, "Invalid mock block.");
+
     return new Validation();
   }
 }

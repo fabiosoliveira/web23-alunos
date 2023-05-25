@@ -2,11 +2,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import axios from "axios";
-import readline from "node:readline/promises";
+import readline from "readline";
 import Wallet from "../lib/Wallet";
-import { setTimeout } from "node:timers/promises";
 import Transaction from "../lib/Transaction";
-import TransactionType from "../lib/TransactionType";
 import TransactionInput from "../lib/TransactionInput";
 import TransactionOutput from "../lib/TransactionOutput";
 
@@ -20,53 +18,50 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-async function menu() {
-  await setTimeout(1000);
-  console.clear();
+function menu() {
+  setTimeout(() => {
+    console.clear();
 
-  if (myWalletPub) {
-    console.log(`You are logged as ${myWalletPub}`);
-  } else {
-    console.log("You are not logged.");
-  }
+    if (myWalletPub) console.log(`You are logged as ${myWalletPub}`);
+    else console.log(`You aren't logged.`);
 
-  console.log("1 - Create wallet");
-  console.log("2 - Recover wallet");
-  console.log("3 - Balance");
-  console.log("4 - Send tx");
-  console.log("5 - Search tx");
-
-  const answer = await rl.question("Choose your option: ");
-
-  switch (answer) {
-    case "1":
-      createWallet();
-      break;
-    case "2":
-      recoverWallet();
-      break;
-    case "3":
-      getBalance();
-      break;
-    case "4":
-      sendTx();
-      break;
-    case "5":
-      searchTx();
-      break;
-    default: {
-      console.log("Wrong option");
-      menu();
-    }
-  }
+    console.log("1 - Create Wallet");
+    console.log("2 - Recover Wallet");
+    console.log("3 - Balance");
+    console.log("4 - Send tx");
+    console.log("5 - Search tx");
+    rl.question("Choose your option: ", (answer) => {
+      switch (answer) {
+        case "1":
+          createWallet();
+          break;
+        case "2":
+          recoverWallet();
+          break;
+        case "3":
+          getBalance();
+          break;
+        case "4":
+          sendTx();
+          break;
+        case "5":
+          searchTx();
+          break;
+        default: {
+          console.log("Wrong option!");
+          menu();
+        }
+      }
+    });
+  }, 1000);
 }
 
-menu();
-
-async function preMenu() {
-  await rl.question("Press any key to continue...");
-  menu();
+function preMenu() {
+  rl.question(`Press any key to continue...`, () => {
+    menu();
+  });
 }
+
 function createWallet() {
   console.clear();
   const wallet = new Wallet();
@@ -78,115 +73,127 @@ function createWallet() {
   preMenu();
 }
 
-async function recoverWallet() {
+function recoverWallet() {
   console.clear();
-  const wifOrPrivateKey = await rl.question("What is your private key or WIF?");
-  const wallet = new Wallet(wifOrPrivateKey);
-  console.log(`Your recovered wallet:`);
-  console.log(wallet);
+  rl.question(`What is your private key or WIF? `, (wifOrPrivateKey) => {
+    const wallet = new Wallet(wifOrPrivateKey);
+    console.log(`Your recovered wallet:`);
+    console.log(wallet);
 
-  myWalletPub = wallet.publicKey;
-  myWalletPriv = wallet.privateKey;
-  preMenu();
+    myWalletPub = wallet.publicKey;
+    myWalletPriv = wallet.privateKey;
+    preMenu();
+  });
 }
 
 async function getBalance() {
   console.clear();
 
   if (!myWalletPub) {
-    console.log("You don't have a wallet yet.");
+    console.log(`You don't have a wallet yet.`);
     return preMenu();
   }
 
   const { data } = await axios.get(
     `${BLOCKCHAIN_SERVER}wallets/${myWalletPub}`
   );
-  console.log(`Your balance: ${data.balance}`);
-
+  console.log("Balance: " + data.balance);
   preMenu();
 }
 
-async function sendTx() {
+function sendTx() {
   console.clear();
 
   if (!myWalletPub) {
-    console.log("You don't have a wallet yet.");
+    console.log(`You don't have a wallet yet.`);
     return preMenu();
   }
 
   console.log(`Your wallet is ${myWalletPub}`);
-  const toWallet = await rl.question("To Wallet: ");
-  if (toWallet.length < 66) {
-    console.log("Invalid wallet.");
-    return preMenu();
-  }
+  rl.question(`To Wallet: `, (toWallet) => {
+    if (toWallet.length < 66) {
+      console.log(`Invalid wallet.`);
+      return preMenu();
+    }
 
-  const amountStr = await rl.question("Amount: ");
-  const amount = parseInt(amountStr);
-  if (!amount) {
-    console.log("Invalid amount.");
-    return preMenu();
-  }
+    rl.question(`Amount: `, async (amountStr) => {
+      const amount = parseInt(amountStr);
+      if (!amount) {
+        console.log(`Invalid amount.`);
+        return preMenu();
+      }
 
-  const walletResponse = await axios.get(
-    `${BLOCKCHAIN_SERVER}wallets/${myWalletPub}`
-  );
+      const walletResponse = await axios.get(
+        `${BLOCKCHAIN_SERVER}wallets/${myWalletPub}`
+      );
+      const balance = walletResponse.data.balance as number;
+      const fee = walletResponse.data.fee as number;
+      const utxo = walletResponse.data.utxo as TransactionOutput[];
 
-  const balance = walletResponse.data.balance as number;
-  const fee = walletResponse.data.fee as number;
-  const utxo = walletResponse.data.utxo as TransactionOutput[];
+      if (balance < amount + fee) {
+        console.log(`Insufficient balance (tx + fee).`);
+        return preMenu();
+      }
 
-  if (balance < amount + fee) {
-    console.log("Insufficient balance (tx + fee).");
-    return preMenu();
-  }
+      const txInputs = utxo.map((txo) => TransactionInput.fromTxo(txo));
+      txInputs.forEach((txi, index, arr) => arr[index].sign(myWalletPriv));
 
-  const txInputs = utxo.map((utxo) => TransactionInput.fromTxo(utxo));
-  txInputs.forEach((txi, index, arr) => arr[index].sign(myWalletPriv));
+      //Transação de transferência
+      const txOutputs = [] as TransactionOutput[];
+      txOutputs.push(
+        new TransactionOutput({
+          toAddress: toWallet,
+          amount,
+        } as TransactionOutput)
+      );
 
-  // transação de transferencia
-  const txOutputs = [] as TransactionOutput[];
-  txOutputs.push(
-    new TransactionOutput({ toAddress: toWallet, amount } as TransactionOutput)
-  );
+      //Transação de troco
+      const remainingBalance = balance - amount - fee;
+      txOutputs.push(
+        new TransactionOutput({
+          toAddress: myWalletPub,
+          amount: remainingBalance,
+        } as TransactionOutput)
+      );
 
-  // transação de troco
-  const remainingBalance = balance - amount - fee;
-  txOutputs.push(
-    new TransactionOutput({
-      toAddress: toWallet,
-      amount: remainingBalance,
-    } as TransactionOutput)
-  );
+      const tx = new Transaction({
+        txInputs,
+        txOutputs,
+      } as Transaction);
 
-  const tx = new Transaction({
-    txInputs,
-    txOutputs,
-  } as Transaction);
+      tx.hash = tx.getHash();
+      tx.txOutputs.forEach((txo, index, arr) => (arr[index].tx = tx.hash));
 
-  tx.hash = tx.getHash();
-  tx.txOutputs.forEach((txo, index, arr) => (arr[index].tx = tx.hash));
+      console.log(tx);
+      console.log("Remaining Balance: " + remainingBalance);
 
-  console.log(tx);
-  console.log("Remaining balance: ", remainingBalance);
+      try {
+        const txResponse = await axios.post(
+          `${BLOCKCHAIN_SERVER}transactions/`,
+          tx
+        );
+        console.log(`Transaction accepted. Waiting the miners!`);
+        console.log(txResponse.data.hash);
+      } catch (err: any) {
+        console.error(err.response ? err.response.data : err.message);
+      }
 
-  try {
-    const txResponse = await axios.post(`${BLOCKCHAIN_SERVER}transactions`, tx);
-    console.log(
-      `Transaction accepted. Waiting the miners: ${txResponse.data.hash}`
-    );
-  } catch (error: any) {
-    console.error(error.response ? error.response.data : error.message);
-  }
+      return preMenu();
+    });
+  });
 
   preMenu();
 }
 
-async function searchTx() {
+function searchTx() {
   console.clear();
-
-  const hash = await rl.question("Your txHash: ");
-  const response = await axios.get(`${BLOCKCHAIN_SERVER}transactions/${hash}`);
-  console.log(response.data);
-  preMenu();
+  rl.question(`Your tx hash: `, async (hash) => {
+    const response = await axios.get(
+      `${BLOCKCHAIN_SERVER}transactions/${hash}`
+    );
+    console.log(response.data);
+    return preMenu();
+  });
 }
+
+menu();

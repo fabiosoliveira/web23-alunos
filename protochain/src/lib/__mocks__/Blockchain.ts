@@ -7,15 +7,15 @@ import TransactionInput from "./TransactionInput";
 import TransactionOutput from "./TransactionOutput";
 
 /**
- * Blockchain mock class
+ * Mocked Blockchain class
  */
 export default class Blockchain {
   blocks: Block[];
   mempool: Transaction[];
-  nextIndex = 0;
+  nextIndex: number = 0;
 
   /**
-   * Creates a new blockchain mock
+   * Creates a new mocked blockchain
    */
   constructor(miner: string) {
     this.blocks = [];
@@ -37,16 +37,8 @@ export default class Blockchain {
     return this.blocks[this.blocks.length - 1];
   }
 
-  addTransaction(transaction: Transaction): Validation {
-    const validation = transaction.isValid(1, 10);
-    if (!validation.success) return validation;
-
-    this.mempool.push(transaction);
-    return new Validation(true, transaction.hash);
-  }
-
   addBlock(block: Block): Validation {
-    if (block.index < 0) return new Validation(false, `Invalid mock block`);
+    if (block.index < 0) return new Validation(false, "Invalid mock block.");
 
     this.blocks.push(block);
     this.nextIndex++;
@@ -54,19 +46,27 @@ export default class Blockchain {
     return new Validation();
   }
 
-  getBlock(hash: string): Block | undefined {
-    if (!hash || hash === "-1") return undefined;
-    return this.blocks.find((b) => b.hash === hash);
+  addTransaction(transaction: Transaction): Validation {
+    const validation = transaction.isValid(1, 10);
+    if (!validation.success) return validation;
+
+    this.mempool.push(transaction);
+    return new Validation();
   }
 
   getTransaction(hash: string): TransactionSearch {
-    if (hash === "-1") {
+    if (hash === "-1")
       return { mempoolIndex: -1, blockIndex: -1 } as TransactionSearch;
-    }
+
     return {
       mempoolIndex: 0,
       transaction: new Transaction(),
     } as TransactionSearch;
+  }
+
+  getBlock(hash: string): Block | undefined {
+    if (!hash || hash === "-1") return undefined;
+    return this.blocks.find((b) => b.hash === hash);
   }
 
   isValid(): Validation {
@@ -85,7 +85,7 @@ export default class Blockchain {
       index: this.blocks.length,
       feePerTx: this.getFeePerTx(),
       maxDifficulty: 62,
-    };
+    } as BlockInfo;
   }
 
   getTxInputs(wallet: string): (TransactionInput | undefined)[] {

@@ -7,7 +7,7 @@ import TransactionOutput from "./TransactionOutput";
 const ECPair = ECPairFactory(ecc);
 
 /**
- * Transaction class
+ * TransactionInput class
  */
 export default class TransactionInput {
   fromAddress: string;
@@ -18,7 +18,7 @@ export default class TransactionInput {
   /**
    * Creates a new TransactionInput
    * @param txInput The tx input data
-   * */
+   */
   constructor(txInput?: TransactionInput) {
     this.previousTx = txInput?.previousTx || "";
     this.fromAddress = txInput?.fromAddress || "";
@@ -27,10 +27,8 @@ export default class TransactionInput {
   }
 
   /**
-   * Signs a message using the provided private key.
-   *
-   * @param {string} privateKey - The private key to use for signing.
-   * @return {void}
+   * Generates the tx input signature
+   * @param privateKey The 'from' private key
    */
   sign(privateKey: string): void {
     this.signature = ECPair.fromPrivateKey(Buffer.from(privateKey, "hex"))
@@ -39,9 +37,8 @@ export default class TransactionInput {
   }
 
   /**
-   * Returns the hash of the transaction data.
-   *
-   * @return {string} The hash of the transaction data.
+   * Generates the tx input hash
+   * @returns The tx input hash
    */
   getHash(): string {
     const data = this.previousTx + this.fromAddress + this.amount;
@@ -50,15 +47,12 @@ export default class TransactionInput {
   }
 
   /**
-   * Determines if the transaction is valid.
-   *
-   * @return {Validation} A validation object representing the result of the validation.
-   *                      If the transaction is valid, the object will be empty.
-   *                      Otherwise, it will contain a message describing the validation failure.
+   * Validates if the tx input is ok
+   * @returns Returns a validation result object
    */
   isValid(): Validation {
     if (!this.previousTx || !this.signature)
-      return new Validation(false, "Signature and previous Tx are required.");
+      return new Validation(false, "Signature and previous TX are required.");
 
     if (this.amount < 1)
       return new Validation(false, "Amount must be greater than zero.");

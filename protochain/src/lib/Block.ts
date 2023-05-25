@@ -3,6 +3,7 @@ import Validation from "./Validation";
 import BlockInfo from "./BlockInfo";
 import Transaction from "./Transaction";
 import TransactionType from "./TransactionType";
+
 /**
  * Block class
  */
@@ -23,9 +24,11 @@ export default class Block {
     this.index = block?.index || 0;
     this.timestamp = block?.timestamp || Date.now();
     this.previousHash = block?.previousHash || "";
+
     this.transactions = block?.transactions
       ? block.transactions.map((tx) => new Transaction(tx))
-      : [];
+      : ([] as Transaction[]);
+
     this.nonce = block?.nonce || 0;
     this.miner = block?.miner || "";
     this.hash = block?.hash || this.getHash();
@@ -50,7 +53,7 @@ export default class Block {
   }
 
   /**
-   * Generates a new valid hash for this block with the especified difficulty
+   * Generates a new valid hash for this block with the specified difficulty
    * @param difficulty The blockchain current difficulty
    * @param miner The miner wallet address
    */
@@ -65,11 +68,11 @@ export default class Block {
   }
 
   /**
-   * Validates the
+   * Validates the block
    * @param previousHash The previous block hash
    * @param previousIndex The previous block index
    * @param difficulty The blockchain current difficulty
-   * @returns Returns true if the block is valid
+   * @returns Returns if the block is valid
    */
   isValid(
     previousHash: string,
@@ -81,7 +84,6 @@ export default class Block {
       const feeTxs = this.transactions.filter(
         (tx) => tx.type === TransactionType.FEE
       );
-
       if (!feeTxs.length) return new Validation(false, "No fee tx.");
 
       if (feeTxs.length > 1) return new Validation(false, "Too many fees.");
@@ -102,7 +104,7 @@ export default class Block {
       if (errors.length > 0)
         return new Validation(
           false,
-          "Invalid block due to invalid tx: " + errors.join()
+          "Invalid block due to invalid tx: " + errors.reduce((a, b) => a + b)
         );
     }
 
@@ -121,15 +123,13 @@ export default class Block {
     return new Validation();
   }
 
-  static fromBlockInfo({
-    index,
-    previousHash,
-    transactions,
-  }: BlockInfo): Block {
+  static fromBlockInfo(blockInfo: BlockInfo): Block {
     const block = new Block();
-    block.index = index;
-    block.previousHash = previousHash;
-    block.transactions = transactions.map((tx) => new Transaction(tx));
+    block.index = blockInfo.index;
+    block.previousHash = blockInfo.previousHash;
+    block.transactions = blockInfo.transactions.map(
+      (tx) => new Transaction(tx)
+    );
     return block;
   }
 }
