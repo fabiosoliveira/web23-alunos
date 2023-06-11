@@ -1,5 +1,5 @@
-const HelloWorld = artifacts.require("HelloWorld");
+const BookDatabase = artifacts.require("BookDatabase");
 
 module.exports = function (deployer) {
-  deployer.deploy(HelloWorld);
+  deployer.deploy(BookDatabase);
 };
