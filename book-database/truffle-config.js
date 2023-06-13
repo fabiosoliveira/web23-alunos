@@ -2,6 +2,10 @@ require("dotenv").config();
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 module.exports = {
+  plugins: ["truffle-plugin-verify"],
+  api_keys: {
+    etherscan: process.env.API_KEY,
+  },
   networks: {
     goerli: {
       provider: new HDWalletProvider({
