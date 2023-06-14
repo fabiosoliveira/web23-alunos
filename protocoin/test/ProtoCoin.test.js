@@ -18,8 +18,8 @@ contract("ProtoCoin", function (accounts) {
     assert(symbol === "PRC", "Incorrect symbol");
   });
 
-  it("should has correct decimal", async () => {
-    const decimal = await contract.decimal();
+  it("should has correct decimals", async () => {
+    const decimal = await contract.decimals();
     assert(decimal.eq(DECIMALS), "Incorrect decimals");
   });
 
@@ -28,8 +28,8 @@ contract("ProtoCoin", function (accounts) {
     // const totalSuply = await contract.totalSuply();
     // assert(totalSuply.eq(TOTAL_SUPPLY), "Incorrect totalSuply");
     const TOTAL_SUPPLY = BigInt(1000) * BigInt(10) ** BigInt(18);
-    const totalSuply = await contract.totalSuply();
-    assert(BigInt(totalSuply) === TOTAL_SUPPLY, "Incorrect totalSuply");
+    const totalSuply = await contract.totalSupply();
+    assert(BigInt(totalSuply) === TOTAL_SUPPLY, "Incorrect totalSupply");
   });
 
   it("Owner should has total supply", async () => {
