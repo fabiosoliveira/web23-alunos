@@ -73,4 +73,13 @@ contract("ProtoCoin", function (accounts) {
       );
     }
   });
+
+  it("should approve", async () => {
+    const qty = BigInt(1) * BigInt(10) ** BigInt(18);
+    await contract.approve(accounts[1], qty);
+
+    const allowance = await contract.allowance(accounts[0], accounts[1]);
+
+    assert(BigInt(allowance) === qty, "Incorrect allowance balance");
+  });
 });
