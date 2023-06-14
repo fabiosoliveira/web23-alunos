@@ -8,7 +8,10 @@
   },
   "scripts": {
     "compile": "truffle compile",
-    "test": "truffle test"
+    "test": "truffle test",
+    "deploy:ganache": "truffle migrate --network ganache",
+    "deploy:goerli": "truffle migrate --network goerli",
+    "verify:goerli": "truffle run verify BookDatabase@0x9077688b04659DaeE28653C6c6D14D3D57713EF4 --network goerli"
   },
   "keywords": [],
   "author": "",
