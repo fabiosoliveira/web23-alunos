@@ -11,7 +11,7 @@
     "test": "truffle test",
     "deploy:ganache": "truffle migrate --network ganache",
     "deploy:goerli": "truffle migrate --network goerli",
-    "verify:goerli": "truffle run verify BookDatabase@0x9077688b04659DaeE28653C6c6D14D3D57713EF4 --network goerli"
+    "verify:goerli": "truffle run verify ProtoCoin@0xFf70055ef96b60C242e36402924f06D19C836396 --network goerli"
   },
   "keywords": [],
   "author": "",
@@ -20,5 +20,8 @@
     "@truffle/hdwallet-provider": "^2.1.12",
     "bn.js": "^5.2.1",
     "dotenv": "^16.1.4"
+  },
+  "devDependencies": {
+    "truffle-plugin-verify": "^0.6.3"
   }
 }
