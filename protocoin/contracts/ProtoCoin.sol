@@ -44,4 +44,17 @@ contract ProtoCoin {
 	function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
 		return _allowances[_owner][_spender];
 	}
+
+	function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+		require(balanceOf(_from) >= _value, "Insufficient balance");
+		require(allowance(_from, msg.sender) >= _value, "Insufficient allowance");
+
+		_balances[_from] -= _value;
+		_balances[_to] += _value;
+		_allowances[_from][msg.sender] -= _value;
+
+		emit Transfer(_from, _to, _value);
+		
+		return true;
+	}
 }

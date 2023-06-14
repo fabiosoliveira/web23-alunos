@@ -82,4 +82,51 @@ contract("ProtoCoin", function (accounts) {
 
     assert(BigInt(allowance) === qty, "Incorrect allowance balance");
   });
+
+  it("should transfer from", async () => {
+    const qty = BigInt(1) * BigInt(10) ** BigInt(18);
+
+    const allowanceBefore = await contract.allowance(accounts[0], accounts[1]);
+    const balanceAdminBefore = await contract.balanceOf(accounts[0]);
+    const balanceToBefore = await contract.balanceOf(accounts[1]);
+
+    await contract.approve(accounts[1], qty);
+    await contract.transferFrom(accounts[0], accounts[1], qty, {
+      from: accounts[1],
+    });
+
+    const allowanceNow = await contract.allowance(accounts[0], accounts[1]);
+    const balanceAdminNow = await contract.balanceOf(accounts[0]);
+    const balanceToNow = await contract.balanceOf(accounts[1]);
+
+    assert(
+      BigInt(allowanceNow) === BigInt(allowanceBefore),
+      "Incorrect allowance"
+    );
+    assert(
+      BigInt(balanceAdminNow) === BigInt(balanceAdminBefore) - qty,
+      "Incorrect admin balance"
+    );
+    assert(
+      BigInt(balanceToNow) === BigInt(balanceToBefore) + qty,
+      "Incorrect to balance"
+    );
+  });
+
+  it("should NOT transfer from", async () => {
+    const qty = BigInt(1) * BigInt(10) ** BigInt(18);
+
+    try {
+      await contract.transferFrom(accounts[0], accounts[1], qty, {
+        from: accounts[1],
+      });
+      assert.fail("The transfer should have thrown an error.");
+    } catch (error) {
+      assert.include(
+        error.message,
+        "revert",
+        "The transfer from should be reverted."
+      );
+    }
+  });
 });
