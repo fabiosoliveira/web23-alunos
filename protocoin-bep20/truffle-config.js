@@ -4,9 +4,19 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 module.exports = {
   plugins: ["truffle-plugin-verify"],
   api_keys: {
-    etherscan: process.env.API_KEY,
+    // etherscan: process.env.API_KEY_ETH,
+    bscscan: process.env.API_KEY_BSC,
   },
   networks: {
+    bsctest: {
+      provider: new HDWalletProvider({
+        mnemonic: {
+          phrase: process.env.SECRET,
+        },
+        providerOrUrl: process.env.BSC_URL,
+      }),
+      network_id: "97",
+    },
     goerli: {
       provider: new HDWalletProvider({
         mnemonic: {
