@@ -1,5 +1,8 @@
 const ProtoCoin = artifacts.require("ProtoCoin");
-const BN = require("bn.js");
+const {
+  BN, // Big Number support
+  time,
+} = require("@openzeppelin/test-helpers");
 
 contract("ProtoCoin", function (accounts) {
   const DECIMALS = new BN(18);
@@ -10,12 +13,12 @@ contract("ProtoCoin", function (accounts) {
 
   it("should has correct name", async () => {
     const name = await contract.name();
-    assert(name === "ProtoCoin", "Incorrect name");
+    assert(name === "New ProtoCoin", "Incorrect name");
   });
 
   it("should has correct symbol", async () => {
     const symbol = await contract.symbol();
-    assert(symbol === "PRC", "Incorrect symbol");
+    assert(symbol === "NPC", "Incorrect symbol");
   });
 
   it("should has correct decimals", async () => {
@@ -126,6 +129,120 @@ contract("ProtoCoin", function (accounts) {
         error.message,
         "revert",
         "The transfer from should be reverted."
+      );
+    }
+  });
+
+  it("should mint once", async () => {
+    const minAmount = BigInt(1000);
+    await contract.setMintAmount(minAmount);
+
+    const balanceBefore = await contract.balanceOf(accounts[1]);
+    await contract.mint({ from: accounts[1] });
+    const balanceNow = await contract.balanceOf(accounts[1]);
+
+    assert(
+      BigInt(balanceNow) === BigInt(balanceBefore) + minAmount,
+      "Incorrect balance"
+    );
+  });
+
+  it("should mint twice (different accounts)", async () => {
+    const minAmount = BigInt(1000);
+    await contract.setMintAmount(minAmount);
+
+    const balance1Before = await contract.balanceOf(accounts[1]);
+    const balance2Before = await contract.balanceOf(accounts[2]);
+
+    await contract.mint({ from: accounts[1] });
+    await contract.mint({ from: accounts[2] });
+
+    const balance1Now = await contract.balanceOf(accounts[1]);
+    const balance2Now = await contract.balanceOf(accounts[2]);
+
+    assert(
+      BigInt(balance1Now) === BigInt(balance1Before) + minAmount,
+      "Incorrect balance"
+    );
+    assert(
+      BigInt(balance2Now) === BigInt(balance2Before) + minAmount,
+      "Incorrect balance"
+    );
+  });
+
+  it("should mint twice (different moments)", async () => {
+    const minAmount = BigInt(1000);
+    await contract.setMintAmount(minAmount);
+
+    const delayInSeconds = 1;
+    await contract.setMintDelay(delayInSeconds);
+
+    const balanceBefore = await contract.balanceOf(accounts[1]);
+    await contract.mint({ from: accounts[1] });
+
+    await time.increase(delayInSeconds * 2);
+
+    await contract.mint({ from: accounts[1] });
+    const balanceNow = await contract.balanceOf(accounts[1]);
+
+    assert(
+      BigInt(balanceNow) === BigInt(balanceBefore) + minAmount * 2n,
+      "Incorrect balance"
+    );
+  });
+
+  it("should NOT setMintAmount (permission)", async () => {
+    try {
+      await contract.setMintAmount(1000, { from: accounts[1] });
+      assert.fail("The setMintAmount should have thrown an error.");
+    } catch (error) {
+      assert.include(
+        error.message,
+        "revert",
+        "The setMintAmount from should be reverted."
+      );
+    }
+  });
+
+  it("should NOT setMintDelay (permission)", async () => {
+    try {
+      await contract.setMintDelay(1000, { from: accounts[1] });
+      assert.fail("The setMintDelay should have thrown an error.");
+    } catch (error) {
+      assert.include(
+        error.message,
+        "revert",
+        "The setMintDelay from should be reverted."
+      );
+    }
+  });
+
+  it("should NOT mint (disable)", async () => {
+    try {
+      await contract.mint({ from: accounts[1] });
+      assert.fail("The mint should have thrown an error.");
+    } catch (error) {
+      assert.include(
+        error.message,
+        "revert",
+        "The mint from should be reverted."
+      );
+    }
+  });
+
+  it("should NOT mint twice", async () => {
+    await contract.setMintAmount(1000);
+
+    await contract.mint({ from: accounts[1] });
+
+    try {
+      await contract.mint({ from: accounts[1] });
+      assert.fail("The mint should have thrown an error.");
+    } catch (error) {
+      assert.include(
+        error.message,
+        "revert",
+        "The mint from should be reverted."
       );
     }
   });
