@@ -1,4 +1,10 @@
+import { mint } from "./Web3Service";
+
 function App() {
+  function handleButtonClick() {
+    mint();
+  }
+
   return (
     <>
       <div className="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
@@ -29,6 +35,7 @@ function App() {
           <p className="lead">
             <a
               href="#"
+              onClick={handleButtonClick}
               className="btn btn-lg btn-light fw-bold border-white bg-white"
             >
               <img
@@ -36,7 +43,7 @@ function App() {
                 alt="MetaMask Logo"
                 width={48}
               />
-              Learn more
+              Connect MetaMask
             </a>
           </p>
         </main>
