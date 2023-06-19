@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <header className="mb-auto">
+          <div>
+            <h3 className="float-md-start mb-0">Protocoin Faucet</h3>
+            <nav className="nav nav-masthead justify-content-center float-md-end">
+              <a
+                className="nav-link fw-bold py-1 px-0 active"
+                aria-current="page"
+                href="#"
+              >
+                Home
+              </a>
+              <a className="nav-link fw-bold py-1 px-0" href="#">
+                About
+              </a>
+            </nav>
+          </div>
+        </header>
+
+        <main className="px-3">
+          <h1>Get your Protocoins</h1>
+          <p className="lead">
+            Once a day, earn 1.000 coins for free just connecting your MetaMask
+            bellow.
+          </p>
+          <p className="lead">
+            <a
+              href="#"
+              className="btn btn-lg btn-light fw-bold border-white bg-white"
+            >
+              <img
+                src="src/assets/metamask.svg"
+                alt="MetaMask Logo"
+                width={48}
+              />
+              Learn more
+            </a>
+          </p>
+        </main>
+
+        <footer className="mt-auto text-white-50">
+          <p>
+            Build by{" "}
+            <a href="https://twitter.com/mdo" className="text-white">
+              Fábio Oliveira
+            </a>
+            .
+          </p>
+        </footer>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
