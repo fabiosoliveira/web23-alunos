@@ -2,7 +2,9 @@ import { mint } from "./Web3Service";
 
 function App() {
   function handleButtonClick() {
-    mint();
+    mint()
+      .then(console.log)
+      .catch((e) => alert(e.message));
   }
 
   return (
