@@ -30,13 +30,13 @@ contract("ProtoCoin", function (accounts) {
     // const TOTAL_SUPPLY = new BN(1000).mul(new BN(10).pow(DECIMALS));
     // const totalSuply = await contract.totalSuply();
     // assert(totalSuply.eq(TOTAL_SUPPLY), "Incorrect totalSuply");
-    const TOTAL_SUPPLY = BigInt(1000) * BigInt(10) ** BigInt(18);
+    const TOTAL_SUPPLY = BigInt(10000000) * BigInt(10) ** BigInt(18);
     const totalSuply = await contract.totalSupply();
     assert(BigInt(totalSuply) === TOTAL_SUPPLY, "Incorrect totalSupply");
   });
 
   it("Owner should has total supply", async () => {
-    const TOTAL_SUPPLY = BigInt(1000) * BigInt(10) ** BigInt(18);
+    const TOTAL_SUPPLY = BigInt(10000000) * BigInt(10) ** BigInt(18);
     const balance = await contract.balanceOf(accounts[0]);
     assert(BigInt(balance) === TOTAL_SUPPLY, "Incorrect balance");
   });
@@ -63,7 +63,7 @@ contract("ProtoCoin", function (accounts) {
   });
 
   it("should NOT transfer", async () => {
-    const qty = BigInt(1001) * BigInt(10) ** BigInt(18);
+    const qty = BigInt(10000001) * BigInt(10) ** BigInt(18);
 
     try {
       await contract.transfer(accounts[1], qty);
@@ -134,7 +134,7 @@ contract("ProtoCoin", function (accounts) {
   });
 
   it("should mint once", async () => {
-    const minAmount = BigInt(1000);
+    const minAmount = BigInt(10000000);
     await contract.setMintAmount(minAmount);
 
     const balanceBefore = await contract.balanceOf(accounts[1]);
@@ -147,8 +147,25 @@ contract("ProtoCoin", function (accounts) {
     );
   });
 
+  it("should mint twice (owner)", async () => {
+    const minAmount = BigInt(10000000);
+    await contract.setMintAmount(minAmount);
+
+    const balanceBefore = await contract.balanceOf(accounts[0]);
+
+    await contract.mint({ from: accounts[0] });
+    await contract.mint({ from: accounts[0] });
+
+    const balanceNow = await contract.balanceOf(accounts[0]);
+
+    assert(
+      BigInt(balanceNow) === BigInt(balanceBefore) + minAmount * 2n,
+      "Incorrect balance"
+    );
+  });
+
   it("should mint twice (different accounts)", async () => {
-    const minAmount = BigInt(1000);
+    const minAmount = BigInt(10000000);
     await contract.setMintAmount(minAmount);
 
     const balance1Before = await contract.balanceOf(accounts[1]);
@@ -171,7 +188,7 @@ contract("ProtoCoin", function (accounts) {
   });
 
   it("should mint twice (different moments)", async () => {
-    const minAmount = BigInt(1000);
+    const minAmount = BigInt(10000000);
     await contract.setMintAmount(minAmount);
 
     const delayInSeconds = 1;

@@ -14,14 +14,17 @@ contract ProtoCoin is ERC20 {
 
     constructor() ERC20("New ProtoCoin", "NPC") {
         _owner = msg.sender;
-        _mint(msg.sender, 1000 * 10 ** 18);
+        _mint(msg.sender, 10000000 * 10 ** 18);
     }
 
     function mint() public {
         require(_mintAmount > 0, "Minting is not enabled.");
         require(block.timestamp > nextMin[msg.sender], "You cannot mint twice in a row.");
         _mint(msg.sender, _mintAmount);
-        nextMin[msg.sender] = block.timestamp + _minDelay;
+
+        if(msg.sender != _owner) {
+            nextMin[msg.sender] = block.timestamp + _minDelay;
+        }
     }
 
     function setMintAmount(uint256 newAmount) public restricted {

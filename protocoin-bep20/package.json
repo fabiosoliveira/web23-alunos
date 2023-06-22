@@ -13,7 +13,7 @@
     "deploy:goerli": "truffle migrate --network goerli",
     "deploy:bsctest": "truffle migrate --network bsctest",
     "verify:goerli": "truffle run verify ProtoCoin@0xFf70055ef96b60C242e36402924f06D19C836396 --network goerli",
-    "verify:bsctest": "truffle run verify ProtoCoin@0xb2804DCD0985aB727Baf625bffD2976afee59542 --network bsctest"
+    "verify:bsctest": "truffle run verify ProtoCoin@0x1d5A64CA9621A66Bb014ed6a7d132537A45a3C9f --network bsctest"
   },
   "keywords": [],
   "author": "",
