@@ -35,7 +35,7 @@ function App() {
         <main className="px-3">
           <h1>Get your Protocoins</h1>
           <p className="lead">
-            Once a day, earn 1.000 coins for free just connecting your MetaMask
+            Once a day, earn 10.000 coins for free just connecting your MetaMask
             bellow.
           </p>
           <p className="lead">
@@ -49,7 +49,7 @@ function App() {
                 alt="MetaMask Logo"
                 width={48}
               />
-              Connect MetaMask
+              Get my tokens
             </a>
           </p>
           <p className="lead">{message}</p>

@@ -1,8 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import morgan from "morgan";
+import cors from "cors";
 import { minAndTransfer } from "./Web3Provider";
 
 const PORT = process.env.PORT || 3000;
@@ -10,6 +11,7 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(morgan("tiny"));
+app.use(cors({ origin: process.env.CORS_ORIGINS || "*" }));
 
 app.post("/mint/:wallet", async (req: Request, res: Response) => {
   try {
