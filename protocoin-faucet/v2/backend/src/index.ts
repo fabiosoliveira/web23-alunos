@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 import { minAndTransfer } from "./Web3Provider";
 

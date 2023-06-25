@@ -1,12 +1,12 @@
-import BN from 'bn.js';
-import BigNumber from 'bignumber.js';
+import BN from "bn.js";
+import BigNumber from "bignumber.js";
 import {
   PromiEvent,
   TransactionReceipt,
   EventResponse,
   EventData,
   Web3ContractContext,
-} from 'ethereum-abi-types-generator';
+} from "ethereum-abi-types-generator";
 
 export interface CallOptions {
   from?: string;
@@ -28,7 +28,7 @@ export interface EstimateGasOptions {
 }
 
 export interface MethodPayableReturnContext {
-  send(options: SendOptions): PromiEvent<TransactionReceipt>;
+  send(options?: SendOptions): PromiEvent<TransactionReceipt>;
   send(
     options: SendOptions,
     callback: (error: Error, result: any) => void
@@ -59,13 +59,13 @@ export type ContractContext = Web3ContractContext<
   AbiEventsContext,
   AbiEvents
 >;
-export type AbiEvents = 'Approval' | 'Transfer';
+export type AbiEvents = "Approval" | "Transfer";
 export interface AbiEventsContext {
   Approval(
     parameters: {
       filter?: { owner?: string | string[]; spender?: string | string[] };
       fromBlock?: number;
-      toBlock?: 'latest' | number;
+      toBlock?: "latest" | number;
       topics?: string[];
     },
     callback?: (error: Error, event: EventData) => void
@@ -74,28 +74,28 @@ export interface AbiEventsContext {
     parameters: {
       filter?: { from?: string | string[]; to?: string | string[] };
       fromBlock?: number;
-      toBlock?: 'latest' | number;
+      toBlock?: "latest" | number;
       topics?: string[];
     },
     callback?: (error: Error, event: EventData) => void
   ): EventResponse;
 }
 export type AbiMethodNames =
-  | 'new'
-  | 'allowance'
-  | 'approve'
-  | 'balanceOf'
-  | 'decimals'
-  | 'decreaseAllowance'
-  | 'increaseAllowance'
-  | 'mint'
-  | 'name'
-  | 'setMintAmount'
-  | 'setMintDelay'
-  | 'symbol'
-  | 'totalSupply'
-  | 'transfer'
-  | 'transferFrom';
+  | "new"
+  | "allowance"
+  | "approve"
+  | "balanceOf"
+  | "decimals"
+  | "decreaseAllowance"
+  | "increaseAllowance"
+  | "mint"
+  | "name"
+  | "setMintAmount"
+  | "setMintDelay"
+  | "symbol"
+  | "totalSupply"
+  | "transfer"
+  | "transferFrom";
 export interface ApprovalEventEmittedResponse {
   owner: string;
   spender: string;
@@ -113,7 +113,7 @@ export interface Abi {
    * StateMutability: nonpayable
    * Type: constructor
    */
-  'new'(): MethodReturnContext;
+  "new"(): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true
