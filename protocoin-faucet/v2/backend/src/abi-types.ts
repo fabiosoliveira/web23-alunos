@@ -176,8 +176,9 @@ export interface Abi {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
+   * @param to Type: address, Indexed: false
    */
-  mint(): MethodReturnContext;
+  mint(to: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true

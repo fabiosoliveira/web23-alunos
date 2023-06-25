@@ -4,7 +4,7 @@ dotenv.config();
 import express, { Request, Response } from "express";
 import morgan from "morgan";
 import cors from "cors";
-import { minAndTransfer } from "./Web3Provider";
+import { minAndTransfer } from "./web3Provider";
 
 const PORT = process.env.PORT || 3000;
 

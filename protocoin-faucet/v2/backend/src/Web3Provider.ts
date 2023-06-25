@@ -20,10 +20,7 @@ export async function minAndTransfer(to: string): Promise<string> {
     from: WALLET,
   }) as unknown as ContractContext;
 
-  const [tx1, tx2] = await Promise.all([
-    contract.methods.mint().send(),
-    contract.methods.transfer(to, "10000").send(),
-  ]);
+  const tx =  await contract.methods.mint(to).send()
 
-  return tx2.transactionHash;
+  return tx.transactionHash;
 }
