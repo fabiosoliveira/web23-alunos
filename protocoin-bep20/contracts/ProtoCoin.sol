@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract ProtoCoin is ERC20 {
 
-    address private _owner;
+    address immutable _owner;
     uint private _mintAmount = 0;
     uint64 private _minDelay = 60 * 60 * 24; // 1 day in seconds
 
@@ -17,14 +17,12 @@ contract ProtoCoin is ERC20 {
         _mint(msg.sender, 10000000 * 10 ** 18);
     }
 
-    function mint() public {
+    function mint(address to) public restricted {
         require(_mintAmount > 0, "Minting is not enabled.");
-        require(block.timestamp > nextMin[msg.sender], "You cannot mint twice in a row.");
-        _mint(msg.sender, _mintAmount);
+        require(block.timestamp > nextMin[to], "You cannot mint twice in a row.");
+        _mint(to, _mintAmount);
 
-        if(msg.sender != _owner) {
-            nextMin[msg.sender] = block.timestamp + _minDelay;
-        }
+        nextMin[to] = block.timestamp + _minDelay;
     }
 
     function setMintAmount(uint256 newAmount) public restricted {
