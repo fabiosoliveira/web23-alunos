@@ -10,7 +10,13 @@ function App() {
     if (captcha) {
       setMessage("Request your tokens...wait...");
       mint()
-        .then((tx) => setMessage("Your tokens were sent. Tx: " + tx))
+        .then((tx) =>
+          setMessage(
+            `Your tokens were sent to ${localStorage.getItem(
+              "wallet"
+            )}. Tx: ${tx}`
+          )
+        )
         .catch((e) => setMessage(e.message));
       setCaptcha(null);
     } else {
