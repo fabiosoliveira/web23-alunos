@@ -1,4 +1,5 @@
-import { Web3 } from "web3";
+import Web3 from "web3";
+import { AbiItem } from "web3-utils";
 import HDWalletProvider from "@truffle/hdwallet-provider";
 import ABI from "./abi.json";
 import { ContractContext } from "./abi-types";
@@ -16,11 +17,11 @@ const localKeyProvider = new HDWalletProvider({
 const web3 = new Web3(localKeyProvider as any);
 
 export async function minAndTransfer(to: string): Promise<string> {
-  const contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS, {
+  const contract = new web3.eth.Contract(ABI as AbiItem[], CONTRACT_ADDRESS, {
     from: WALLET,
   }) as unknown as ContractContext;
 
-  const tx =  await contract.methods.mint(to).send()
+  const tx = await contract.methods.mint(to).send();
 
   return tx.transactionHash;
 }

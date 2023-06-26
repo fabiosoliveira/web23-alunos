@@ -15,7 +15,7 @@ export async function mint() {
     return response.data;
   } catch (error: any) {
     if (error.response) {
-      throw error.response.data;
+      throw new Error(error.response.data.error);
     }
     throw error;
   }

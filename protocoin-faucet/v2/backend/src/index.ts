@@ -17,8 +17,8 @@ app.post("/mint/:wallet", async (req: Request, res: Response) => {
   try {
     const tx = await minAndTransfer(req.params.wallet);
     res.json(tx);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: any) {
+    res.status(500).send({ error: error.message });
   }
 });
 
