@@ -1,14 +1,21 @@
 import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 import { mint } from "./Web3Service";
 
 function App() {
   const [message, setMessage] = useState("");
+  const [captcha, setCaptcha] = useState<string | null>(null);
 
   function handleButtonClick() {
-    setMessage("Request your tokens...wait...");
-    mint()
-      .then((tx) => setMessage("Your tokens were sent. Tx: " + tx))
-      .catch((e) => setMessage(e.message));
+    if (captcha) {
+      setMessage("Request your tokens...wait...");
+      mint()
+        .then((tx) => setMessage("Your tokens were sent. Tx: " + tx))
+        .catch((e) => setMessage(e.message));
+      setCaptcha(null);
+    } else {
+      setMessage("Check the 'I am not robot' box first");
+    }
   }
 
   return (
@@ -52,6 +59,12 @@ function App() {
               Get my tokens
             </a>
           </p>
+          <div style={{ display: "inline-flex" }}>
+            <ReCAPTCHA
+              sitekey={import.meta.env.VITE_APP_RECAPTCHA_KEY}
+              onChange={setCaptcha}
+            />
+          </div>
           <p className="lead">{message}</p>
         </main>
 
