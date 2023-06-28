@@ -1,0 +1,26 @@
+{
+  "name": "blockchain",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "compile": "truffle compile",
+    "test": "truffle test",
+    "deploy:ganache": "truffle migrate --network ganache",
+    "deploy:bsctest": "truffle migrate --network bsctest",
+    "verify:bsctest": "truffle run verify ProtoCoin@0x451A59B70e77ffCcE8eD36Ee7CA9c05265dC64E0 --network bsctest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^2.1.12",
+    "dotenv": "^16.1.4"
+  },
+  "devDependencies": {
+    "truffle-plugin-verify": "^0.6.3"
+  }
+}
