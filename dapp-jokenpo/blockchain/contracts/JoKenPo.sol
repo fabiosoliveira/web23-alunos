@@ -13,7 +13,7 @@ contract JoKenPo {
     Options private choice1 = Options.NONE;
     address private player1;
     string private result = "";
-    uint256 private bid = 0.1 ether;
+    uint256 private bid = 0.01 ether;
     uint8 private commission = 10; //percent
 
     address payable private immutable owner;
