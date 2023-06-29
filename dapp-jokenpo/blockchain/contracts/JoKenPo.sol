@@ -2,13 +2,9 @@
 
 pragma solidity ^0.8.17;
 
-contract JoKenPo {
-    enum Options {
-        NONE,
-        ROCK,
-        PAPER,
-        SCISSORS
-    }
+import './IJoKenPo.sol';
+
+contract JoKenPo is IJoKenPo {
 
     Options private choice1 = Options.NONE;
     address private player1;
@@ -17,11 +13,6 @@ contract JoKenPo {
     uint8 private commission = 10; //percent
 
     address payable private immutable owner;
-
-    struct Player {
-        address wallet;
-        uint32 wins;
-    }
 
     Player[] public players;
 
@@ -76,7 +67,7 @@ contract JoKenPo {
         choice1 = Options.NONE;
     }
 
-    function getBalance() public view returns (uint256) {
+    function getBalance() external view returns (uint256) {
         require(owner == msg.sender, "You do not have this permission");
         return address(this).balance;
     }
