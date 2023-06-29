@@ -1,4 +1,5 @@
 const JoKenPo = artifacts.require("JoKenPo");
+const JKPLibrary = artifacts.require("JKPLibrary");
 
 contract("JoKenPo", function (accounts) {
   beforeEach(async () => {
@@ -6,11 +7,11 @@ contract("JoKenPo", function (accounts) {
   });
 
   it("Should get leaderboard", async () => {
-    await contract.play(JoKenPo.Options.PAPER, {
+    await contract.play(JKPLibrary.Options.PAPER, {
       from: accounts[1],
       value: web3.utils.toWei("0.01", "ether"),
     });
-    await contract.play(JoKenPo.Options.ROCK, {
+    await contract.play(JKPLibrary.Options.ROCK, {
       from: accounts[2],
       value: web3.utils.toWei("0.01", "ether"),
     });
@@ -44,7 +45,7 @@ contract("JoKenPo", function (accounts) {
   it("Should NOT set bid (game in progress)", async () => {
     const newBid = web3.utils.toWei("0.02", "ether");
 
-    await contract.play(JoKenPo.Options.PAPER, {
+    await contract.play(JKPLibrary.Options.PAPER, {
       from: accounts[1],
       value: web3.utils.toWei("0.01", "ether"),
     });
@@ -83,7 +84,7 @@ contract("JoKenPo", function (accounts) {
   it("Should NOT set commission (game in progress)", async () => {
     const newCommission = web3.utils.toBN("11");
 
-    await contract.play(JoKenPo.Options.PAPER, {
+    await contract.play(JKPLibrary.Options.PAPER, {
       from: accounts[1],
       value: web3.utils.toWei("0.01", "ether"),
     });
@@ -101,7 +102,7 @@ contract("JoKenPo", function (accounts) {
   });
 
   it("Should play alone", async () => {
-    await contract.play(JoKenPo.Options.PAPER, {
+    await contract.play(JKPLibrary.Options.PAPER, {
       from: accounts[1],
       value: web3.utils.toWei("0.01", "ether"),
     });
@@ -114,11 +115,11 @@ contract("JoKenPo", function (accounts) {
   });
 
   it("Should play along", async () => {
-    await contract.play(JoKenPo.Options.PAPER, {
+    await contract.play(JKPLibrary.Options.PAPER, {
       from: accounts[1],
       value: web3.utils.toWei("0.01", "ether"),
     });
-    await contract.play(JoKenPo.Options.ROCK, {
+    await contract.play(JKPLibrary.Options.ROCK, {
       from: accounts[2],
       value: web3.utils.toWei("0.01", "ether"),
     });
@@ -128,7 +129,7 @@ contract("JoKenPo", function (accounts) {
 
   it("Should NOT play alone (owner)", async () => {
     try {
-      await contract.play(JoKenPo.Options.PAPER, {
+      await contract.play(JKPLibrary.Options.PAPER, {
         from: accounts[0],
         value: web3.utils.toWei("0.01", "ether"),
       });
@@ -140,7 +141,7 @@ contract("JoKenPo", function (accounts) {
 
   it("Should NOT play alone (option)", async () => {
     try {
-      await contract.play(JoKenPo.Options.NONE, {
+      await contract.play(JKPLibrary.Options.NONE, {
         from: accounts[1],
         value: web3.utils.toWei("0.01", "ether"),
       });
@@ -151,13 +152,13 @@ contract("JoKenPo", function (accounts) {
   });
 
   it("Should NOT play alone (twice in a row)", async () => {
-    await contract.play(JoKenPo.Options.ROCK, {
+    await contract.play(JKPLibrary.Options.ROCK, {
       from: accounts[1],
       value: web3.utils.toWei("0.01", "ether"),
     });
 
     try {
-      await contract.play(JoKenPo.Options.PAPER, {
+      await contract.play(JKPLibrary.Options.PAPER, {
         from: accounts[1],
         value: web3.utils.toWei("0.01", "ether"),
       });
@@ -169,7 +170,7 @@ contract("JoKenPo", function (accounts) {
 
   it("Should NOT play alone (bid)", async () => {
     try {
-      await contract.play(JoKenPo.Options.PAPER, {
+      await contract.play(JKPLibrary.Options.PAPER, {
         from: accounts[1],
         value: web3.utils.toWei("0.001", "ether"),
       });

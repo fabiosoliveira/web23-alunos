@@ -50,7 +50,8 @@ contract JKPAdapter {
         return joKenPo.getLeaderboard();
     }
 
-    function upgrade(address newImplementation) external restricted upgrated {
+    function upgrade(address newImplementation) external restricted {
+        require(address(0) != newImplementation, "The address is required");
         joKenPo = IJoKenPo(newImplementation);
     }
 
