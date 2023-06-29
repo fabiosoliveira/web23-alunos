@@ -34,13 +34,13 @@ contract JoKenPo is IJoKenPo {
     }
 
     function setBid(uint256 newBid) external {
-        require(msg.sender == owner, "You do not have permission");
+        require(tx.origin == owner, "You do not have permission");
         require(player1 == address(0), "You cannot change the bid with a game in progress");
         bid = newBid;
     }
 
     function setCommission(uint8 newCommission) external {
-        require(msg.sender == owner, "You do not have permission");
+        require(tx.origin == owner, "You do not have permission");
         require(player1 == address(0), "You cannot change the commission with a game in progress");
         commission = newCommission;
     }
@@ -69,18 +69,18 @@ contract JoKenPo is IJoKenPo {
     }
 
     function getBalance() external view returns (uint256) {
-        require(owner == msg.sender, "You do not have this permission");
+        require(owner == tx.origin, "You do not have this permission");
         return address(this).balance;
     }
 
     function play(JKPLibrary.Options newChoice) external payable {
-        require(msg.sender != owner, "The owner cannot play");
+        require(tx.origin != owner, "The owner cannot play");
         require(newChoice != JKPLibrary.Options.NONE, "Invalid choice");
-        require(player1 != msg.sender, "Wait the anohter player");
+        require(player1 != tx.origin, "Wait the anohter player");
         require(msg.value >= bid, "Invalid bid");
 
         if (choice1 == JKPLibrary.Options.NONE) {
-            player1 = msg.sender;
+            player1 = tx.origin;
             choice1 = newChoice;
             result = "Player 1 choose his/her option. Waiting player 2.";
         } 
@@ -92,11 +92,11 @@ contract JoKenPo is IJoKenPo {
         else if (choice1 == JKPLibrary.Options.SCISSORS && newChoice == JKPLibrary.Options.PAPER)
             finishGame("Scossors cuts paper. Player 1 won.", player1);
         else if (choice1 == JKPLibrary.Options.SCISSORS && newChoice == JKPLibrary.Options.ROCK)
-            finishGame("Rock breaks scissors. Player 2 won.", msg.sender);
+            finishGame("Rock breaks scissors. Player 2 won.", tx.origin);
         else if (choice1 == JKPLibrary.Options.ROCK && newChoice == JKPLibrary.Options.PAPER)
-            finishGame("Paper wraps rock. Player 2 won.", msg.sender);
+            finishGame("Paper wraps rock. Player 2 won.", tx.origin);
         else if (choice1 == JKPLibrary.Options.PAPER && newChoice == JKPLibrary.Options.SCISSORS)
-            finishGame("Scossors cuts paper. Player 2 won.", msg.sender);
+            finishGame("Scossors cuts paper. Player 2 won.", tx.origin);
         else {
             result = "Draw game. The prize was doubled.";
             player1 = address(0);

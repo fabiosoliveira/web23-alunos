@@ -22,18 +22,45 @@ contract JKPAdapter {
         return joKenPo.getResult();
     }
 
-    function play(JKPLibrary.Options newChoice) external payable upgrated {
-
+    function getBid() external view returns (uint256) {
+        return joKenPo.getBid();
     }
 
-    modifier upgrated() {
+    function getCommission() external view returns (uint8) {
+        return joKenPo.getCommission();
+    }
+
+    function setBid(uint256 newBid) external restricted {
+        joKenPo.setBid(newBid);
+    }
+
+    function setCommission(uint8 newCommission) external restricted {
+        joKenPo.setCommission(newCommission);
+    }
+
+    function getBalance() external view returns (uint256) {
+        return joKenPo.getBalance();
+    }
+
+    function play(JKPLibrary.Options newChoice) external payable upgrated {
+        joKenPo.play{value: msg.value}(newChoice);
+    }
+
+    function getLeaderboard() external view returns (JKPLibrary.Player[] memory) {
+        return joKenPo.getLeaderboard();
+    }
+
+    function upgrade(address newImplementation) external restricted upgrated {
+        joKenPo = IJoKenPo(newImplementation);
+    }
+
+    modifier restricted(){
         require(msg.sender == owner, "You do not have permission");
         _;
     }
 
-    function upgrade(address newImplementation) external {
-        require(msg.sender == owner, "You do not have permission");
-        require(newImplementation != address(0), "Empty address is not permitted");
-        joKenPo = IJoKenPo(newImplementation);
+    modifier upgrated() {
+        require(address(joKenPo) != address(0), "You must upgrade first");
+        _;
     }
 }
