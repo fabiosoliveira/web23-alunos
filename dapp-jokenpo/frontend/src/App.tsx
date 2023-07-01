@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./Header";
-import { Leaderboard, Options } from "./Web3Service";
+import {
+  Leaderboard,
+  Options,
+  getResult,
+  play,
+  getLeaderboard,
+} from "./Web3Service";
 
 function App() {
   const [message, setMessage] = useState("");
   const [leaderboard, setLeaderboard] = useState<Leaderboard>();
 
+  useEffect(() => {
+    getLeaderboard()
+      .then((leaderboard) => setLeaderboard(leaderboard))
+      .catch((err) => setMessage(err.message));
+  }, []);
+
   function onPlay(option: Options) {
-    alert(option);
+    setLeaderboard((prevState) => ({
+      ...prevState,
+      result: "Sending your choice...",
+    }));
+    play(option)
+      .then((tx) => getResult())
+      .then((result) =>
+        setLeaderboard((prevState) => ({ ...prevState, result }))
+      )
+      .catch((err) => setMessage(err.message));
   }
 
   return (

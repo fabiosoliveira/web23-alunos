@@ -15,7 +15,7 @@ export interface CallOptions {
 }
 
 export interface SendOptions {
-  from: string;
+  from?: string;
   value?: number | string | BN | BigNumber;
   gasPrice?: string;
   gas?: number;
