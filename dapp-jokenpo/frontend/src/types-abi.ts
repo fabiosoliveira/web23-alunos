@@ -59,8 +59,18 @@ export type ContractContext = Web3ContractContext<
   TypesAbiEventsContext,
   TypesAbiEvents
 >;
-export type TypesAbiEvents = undefined;
-export interface TypesAbiEventsContext {}
+export type TypesAbiEvents = "Played";
+export interface TypesAbiEventsContext {
+  Played(
+    parameters: {
+      filter?: { player?: string | string[] };
+      fromBlock?: "latest" | number;
+      toBlock?: "latest" | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
+}
 export type TypesAbiMethodNames =
   | "new"
   | "owner"
@@ -74,6 +84,10 @@ export type TypesAbiMethodNames =
   | "play"
   | "getLeaderboard"
   | "upgrade";
+export interface PlayedEventEmittedResponse {
+  player: string;
+  result: string;
+}
 export interface PlayerResponse {
   wallet: string;
   wins: string;

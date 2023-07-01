@@ -3,9 +3,10 @@ import Header from "./Header";
 import {
   Leaderboard,
   Options,
-  getResult,
   play,
   getLeaderboard,
+  listenEvent,
+  getBestPlayers,
 } from "./Web3Service";
 
 function App() {
@@ -16,6 +17,12 @@ function App() {
     getLeaderboard()
       .then((leaderboard) => setLeaderboard(leaderboard))
       .catch((err) => setMessage(err.message));
+
+    listenEvent((result: string) => {
+      getBestPlayers()
+        .then((players) => setLeaderboard({ players, result }))
+        .catch((err) => setMessage(err.message));
+    });
   }, []);
 
   function onPlay(option: Options) {
@@ -23,12 +30,7 @@ function App() {
       ...prevState,
       result: "Sending your choice...",
     }));
-    play(option)
-      .then((tx) => getResult())
-      .then((result) =>
-        setLeaderboard((prevState) => ({ ...prevState, result }))
-      )
-      .catch((err) => setMessage(err.message));
+    play(option).catch((err) => setMessage(err.message));
   }
 
   return (

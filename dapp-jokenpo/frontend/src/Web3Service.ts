@@ -29,10 +29,8 @@ export async function doLogin() {
     throw new Error("Wallet not found/allowed.");
 
   const contract = getContract(web3);
-  console.log("contract", contract);
 
   const ownerAddress = await contract.methods.owner().call();
-  console.log("ownerAddress", ownerAddress);
 
   localStorage.setItem("account", accounts[0]);
   localStorage.setItem("isAdmin", `${accounts[0] === ownerAddress}`);
@@ -101,6 +99,27 @@ export async function getLeaderboard(): Promise<Leaderboard> {
   const players = await contract.methods.getLeaderboard().call();
   const result = await contract.methods.getResult().call();
   return { players, result };
+}
+
+export async function getBestPlayers() {
+  const contract = getContract();
+  return contract.methods.getLeaderboard().call();
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function listenEvent(callback: Function) {
+  const web3 = new Web3(import.meta.env.VITE_APP_WEBSOCKET_SERVER);
+  const contract = getContract(web3);
+
+  contract.events
+    .Played({ fromBlock: "latest" })
+    .on("data", (event) => callback(event.returnValues.result))
+    .on("error", console.error);
+
+  // contract.events
+  //   .Played({ fromBlock: "latest", filter: { player: "0x0000000000000000000000000000000000000000" } })
+  //   .on("data", (event) => callback(event.returnValues.result))
+  //   .on("error", console.error);
 }
 
 export type Dashboard = {
