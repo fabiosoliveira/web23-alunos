@@ -28,7 +28,10 @@ export async function doLogin() {
     throw new Error("Wallet not found/allowed.");
 
   const contract = getContract(web3);
+  console.log("contract", contract);
+
   const ownerAddress = await contract.methods.owner().call();
+  console.log("ownerAddress", ownerAddress);
 
   localStorage.setItem("account", accounts[0]);
   localStorage.setItem("isAdmin", `${accounts[0] === ownerAddress}`);
