@@ -1,8 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { doLogin } from "./Web3Service";
 
 function Login() {
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (localStorage.getItem("account") !== null) {
+      alert("Already logged in.");
+    }
+  }, []);
 
   function handleButtonClick() {
     setMessage("Loading in...");
