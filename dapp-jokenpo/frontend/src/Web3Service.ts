@@ -46,3 +46,9 @@ export function doLogout() {
   localStorage.removeItem("account");
   localStorage.removeItem("isAdmin");
 }
+
+export type Dashboard = {
+  bid?: string;
+  comission?: number;
+  address?: string;
+};
