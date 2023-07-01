@@ -1,10 +1,22 @@
-import { MouseEvent, ChangeEvent, useState } from "react";
+import { ChangeEvent, useState, useEffect } from "react";
 import Header from "./Header";
-import { Dashboard } from "./Web3Service";
+import {
+  Dashboard,
+  getDashboard,
+  setBid,
+  setCommission,
+  upgrade,
+} from "./Web3Service";
 
 function Admin() {
   const [message, setMessage] = useState("");
   const [dashboard, setDashboard] = useState<Dashboard>();
+
+  useEffect(() => {
+    getDashboard()
+      .then(setDashboard)
+      .catch((err) => setMessage(err.message));
+  }, []);
 
   function onInputChange(event: ChangeEvent<HTMLInputElement>) {
     setDashboard((prevState) => ({
@@ -13,22 +25,34 @@ function Admin() {
     }));
   }
 
-  function onUpgradeClick(
-    event: MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void {
-    alert("Upgrade");
+  function onUpgradeClick(): void {
+    if (!dashboard?.address) {
+      return setMessage("Address is required!");
+    }
+
+    upgrade(dashboard.address)
+      .then((tx) => setMessage("Success. Tx: " + tx))
+      .catch((err) => setMessage(err.message));
   }
 
-  function onChangeCommissionClick(
-    event: MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void {
-    alert("Commission");
+  function onChangeCommissionClick(): void {
+    if (!dashboard?.commission) {
+      return setMessage("Commission is required!");
+    }
+
+    setCommission(dashboard.commission)
+      .then((tx) => setMessage("Success. Tx: " + tx))
+      .catch((err) => setMessage(err.message));
   }
 
-  function onChangeBidClick(
-    event: MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void {
-    alert("Bid");
+  function onChangeBidClick(): void {
+    if (!dashboard?.bid) {
+      return setMessage("Bid is required!");
+    }
+
+    setBid(dashboard.bid)
+      .then((tx) => setMessage("Success. Tx: " + tx))
+      .catch((err) => setMessage(err.message));
   }
 
   return (
@@ -81,7 +105,7 @@ function Admin() {
                   type="number"
                   className="form-control"
                   id="commission"
-                  value={dashboard?.comission || ""}
+                  value={dashboard?.commission || ""}
                   onChange={onInputChange}
                 />
                 <span className="input-group-text bg-secondary">%</span>
