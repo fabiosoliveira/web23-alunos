@@ -41,3 +41,8 @@ export async function doLogin() {
     isAdmin: accounts[0] === ownerAddress,
   };
 }
+
+export function doLogout() {
+  localStorage.removeItem("account");
+  localStorage.removeItem("isAdmin");
+}
