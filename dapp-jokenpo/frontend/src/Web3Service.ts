@@ -89,3 +89,15 @@ export type Dashboard = {
   commission?: string;
   address?: string;
 };
+
+export type Leaderboard = {
+  players?: any[];
+  result?: string;
+};
+
+export enum Options {
+  NONE = 0,
+  ROCK = 1,
+  PAPER = 2,
+  SCISSORS = 3,
+}
