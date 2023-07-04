@@ -10,6 +10,24 @@ contract Condominium {
     mapping (address => uint16) public residents; // wallet => unidade (1101) (2505)
     mapping (address => bool) public counselors; // conselheiro => true
 
+    enum Status {
+        IDLE,
+        VOTING,
+        APPROVED,
+        DENIED
+    } // 0, 1, 2, 3
+
+    struct Topic {
+        string title;
+        string description;
+        Status status;
+        uint256 createdDate;
+        uint256 startDate;
+        uint256 endDate;
+    }
+
+    mapping (bytes32 => Topic) public topics;
+
     constructor() {
         manager = msg.sender;
 
@@ -73,5 +91,36 @@ contract Condominium {
     function setManager(address newManager) external onlyManager {
         require(newManager != address(0), "The address must be valid");
         manager = newManager;
+    }
+
+    function getTopic(string memory title) public view returns (Topic memory) {
+        bytes32 topicId = keccak256(bytes(title));
+        return topics[topicId];
+    }
+
+    function topicExists(string memory title) public view returns (bool) {
+        return getTopic(title).createdDate > 0;
+    }
+
+    function addTopic(string memory title, string memory description) external onlyResidents {
+        require(!topicExists(title), "This topic already exists");
+
+        Topic memory newTopic = Topic({
+            title: title,
+            description: description,
+            createdDate: block.timestamp,
+            startDate: 0,
+            endDate: 0,
+            status: Status.IDLE
+        });
+
+        topics[keccak256(bytes(title))] = newTopic;
+    }
+
+    function removeTopic(string memory title) external onlyManager {
+        Topic memory topic = getTopic(title);
+        require(topic.createdDate > 0, "This topic does not exist");
+        require(topic.status == Status.IDLE, "Only IDLE topics can be removed");
+        delete topics[keccak256(bytes(title))];
     }
 }
