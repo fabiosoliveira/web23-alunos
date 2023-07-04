@@ -129,4 +129,83 @@ describe("Condominium", function () {
       contract.setManager("0x0000000000000000000000000000000000000000")
     ).to.be.revertedWith("The address must be valid");
   });
+
+  it("Should add topic (manager)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addTopic("topic 1", "description 1");
+
+    expect(await contract.topicExists("topic 1")).to.equal(true);
+  });
+
+  it("Should add topic (resident)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 2102);
+
+    const instance = contract.connect(resident);
+    await instance.addTopic("topic 1", "description 1");
+
+    expect(await contract.topicExists("topic 1")).to.equal(true);
+  });
+
+  it("Should NOT add topic (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    const instance = contract.connect(resident);
+
+    await expect(
+      instance.addTopic("topic 1", "description 1")
+    ).to.be.revertedWith("Only the manager or the residents can do this");
+  });
+
+  it("Should NOT add topic (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addTopic("topic 1", "description 1");
+
+    await expect(
+      contract.addTopic("topic 1", "description 1")
+    ).to.be.revertedWith("This topic already exists");
+  });
+
+  it("Should remove topic", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addTopic("topic 1", "description 1");
+    await contract.removeTopic("topic 1");
+
+    expect(await contract.topicExists("topic 1")).to.equal(false);
+  });
+
+  it("Should NOT remove topic (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addTopic("topic 1", "description 1");
+
+    const instance = contract.connect(resident);
+
+    expect(instance.removeTopic("topic 1")).to.be.revertedWith(
+      "Only the manager can do this"
+    );
+  });
+
+  it("Should NOT remove topic (exists)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await expect(contract.removeTopic("topic 1")).to.be.revertedWith(
+      "This topic does not exist"
+    );
+  });
+
+  it("Should NOT remove topic (status)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addTopic("topic 1", "description 1");
+    //todo: trocar status do tópico
+
+    await expect(contract.removeTopic("topic 1")).to.be.revertedWith(
+      "Only IDLE topics can be removed"
+    );
+  });
 });
