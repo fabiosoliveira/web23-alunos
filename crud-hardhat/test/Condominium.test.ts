@@ -69,10 +69,64 @@ describe("Condominium", function () {
 
     await contract.addResident(resident.address, 2102);
 
-    //todo: adicionar no console
+    await contract.setCounselor(resident.address, true);
 
     await expect(contract.removeResident(resident.address)).to.be.revertedWith(
       "A counselor cannot be removed"
     );
+  });
+
+  it("Should set counselor", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 2102);
+
+    await contract.setCounselor(resident.address, true);
+
+    expect(await contract.counselors(resident.address)).to.equal(true);
+  });
+
+  it("Should NOT set counselor (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.addResident(resident.address, 2102);
+
+    const instance = contract.connect(resident);
+    await expect(
+      instance.setCounselor(resident.address, true)
+    ).to.be.revertedWith("Only the manager can do this");
+  });
+
+  it("Should NOT set counselor (resident)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await expect(
+      contract.setCounselor(resident.address, true)
+    ).to.be.revertedWith("This counselor must be a resident");
+  });
+
+  it("Should set manager", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await contract.setManager(resident.address);
+
+    expect(await contract.manager()).to.equal(resident.address);
+  });
+
+  it("Should NOT set manager (permission)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    const instance = contract.connect(resident);
+    await expect(instance.setManager(resident.address)).to.be.revertedWith(
+      "Only the manager can do this"
+    );
+  });
+
+  it("Should NOT set manager (address)", async function () {
+    const { contract, manager, resident } = await loadFixture(deployFixture);
+
+    await expect(
+      contract.setManager("0x0000000000000000000000000000000000000000")
+    ).to.be.revertedWith("The address must be valid");
   });
 });
