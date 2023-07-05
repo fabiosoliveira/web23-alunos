@@ -17,6 +17,13 @@ contract Condominium {
         DENIED
     } // 0, 1, 2, 3
 
+    enum Options {
+        EMPTY,
+        YES,
+        NO,
+        ABSTENTION
+    } // 0, 1, 2, 3
+
     struct Topic {
         string title;
         string description;
@@ -26,7 +33,16 @@ contract Condominium {
         uint256 endDate;
     }
 
+    struct Vote {
+        address resident;
+        uint16 residenceId;
+        Options option;
+        uint256 timestamp;
+    }
+        
+
     mapping (bytes32 => Topic) public topics;
+    mapping (bytes32 => Vote) public votings;
 
     constructor() {
         manager = msg.sender;
@@ -122,5 +138,73 @@ contract Condominium {
         require(topic.createdDate > 0, "This topic does not exist");
         require(topic.status == Status.IDLE, "Only IDLE topics can be removed");
         delete topics[keccak256(bytes(title))];
+    }
+
+    function openVoting(string memory title) external onlyManager {
+        Topic memory topic = getTopic(title);
+        require(topic.createdDate > 0, "This topic does not exist");
+        require(topic.status == Status.IDLE, "Only IDLE topics can be open for voting");
+
+        bytes32 topicId = keccak256(bytes(title));
+        topics[topicId].status = Status.VOTING;
+        topics[topicId].startDate = block.timestamp;
+    }
+
+    function vote(string memory title, Options option) external onlyResidents {
+        require(option != Options.EMPTY, "The option cannot be EMPTY");
+
+        Topic memory topic = getTopic(title);
+        require(topic.createdDate > 0, "This topic does not exist");
+        require(topic.status == Status.VOTING, "Only VOTING topics can be voted");
+
+        uint16 residence = residents[msg.sender];
+        bytes32 topicId = keccak256(bytes(title));
+
+        Vote[] memory votes = votings[topicId];
+
+        for (uint8 i = 0; i < votes.length; i++) {
+            if (votes[i].residence == residence) {
+                require(false, "A residence should vote only once");
+            }
+        }
+
+        Vote memory newVote = Vote({
+            residence: residence,
+            resident: msg.sender,
+            option: option,
+            timestamp: block.timestamp
+        });
+
+        votings[topicId].push(newVote);
+    }
+
+    function closeVoting(string memory title) external onlyManager {
+        Topic memory topic = getTopic(title);
+        require(topic.createdDate > 0, "This topic does not exist");
+        require(topic.status == Status.VOTING, "Only VOTING topics can be closed");
+
+        uint8 approved = 0;
+        uint8 denied = 0;
+        uint8 abstention = 0;
+        bytes32 topicId = keccak256(bytes(title));
+        Vote[] memory votes = votings[topicId];
+
+        for (uint8 i = 0; i < votes.length; i++) {
+            if (votes[i].option == Options.YES) {
+                approved++;
+            } else if (votes[i].option == Options.NO){
+                denied++;
+            } else {
+                abstention++;
+            }
+        }
+
+        if(approved > denied) {
+            topics[topicId].status = Status.APPROVED;
+        } else {
+            topics[topicId].status = Status.DENIED;
+        }
+
+        topics[topicId].endDate = block.timestamp;
     }
 }
