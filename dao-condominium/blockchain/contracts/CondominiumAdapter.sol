@@ -12,6 +12,10 @@ contract CondominiumAdapter {
     constructor(){
         owner = msg.sender;
     }
+
+    function getAddress() external view returns (address) {
+        return address(implementation);
+    }
     
     function upgrade(address newImplementation) external{
         require(owner == msg.sender, "You do not have permission");
