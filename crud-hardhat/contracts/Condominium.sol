@@ -35,14 +35,14 @@ contract Condominium {
 
     struct Vote {
         address resident;
-        uint16 residenceId;
+        uint16 residence;
         Options option;
         uint256 timestamp;
     }
         
 
     mapping (bytes32 => Topic) public topics;
-    mapping (bytes32 => Vote) public votings;
+    mapping (bytes32 => Vote[]) public votings;
 
     constructor() {
         manager = msg.sender;
