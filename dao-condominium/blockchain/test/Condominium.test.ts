@@ -119,30 +119,13 @@ describe("Condominium", function () {
     ).to.be.revertedWith("This counselor must be a resident");
   });
 
-  it("Should set manager", async function () {
-    const { contract, manager, resident } = await loadFixture(deployFixture);
+  // it("Should set manager", async function () {
+  //   const { contract, manager, resident } = await loadFixture(deployFixture);
 
-    await contract.setManager(resident.address);
+  //   await contract.setManager(resident.address);
 
-    expect(await contract.manager()).to.equal(resident.address);
-  });
-
-  it("Should NOT set manager (permission)", async function () {
-    const { contract, manager, resident } = await loadFixture(deployFixture);
-
-    const instance = contract.connect(resident);
-    await expect(instance.setManager(resident.address)).to.be.revertedWith(
-      "Only the manager can do this"
-    );
-  });
-
-  it("Should NOT set manager (address)", async function () {
-    const { contract, manager, resident } = await loadFixture(deployFixture);
-
-    await expect(
-      contract.setManager("0x0000000000000000000000000000000000000000")
-    ).to.be.revertedWith("The address must be valid");
-  });
+  //   expect(await contract.manager()).to.equal(resident.address);
+  // });
 
   it("Should add topic (manager)", async function () {
     const { contract, manager, resident } = await loadFixture(deployFixture);

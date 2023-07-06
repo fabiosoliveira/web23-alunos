@@ -35,11 +35,6 @@ contract CondominiumAdapter {
     }
 
     //TODO: mudar
-    function setManager(address newManager) external {
-        return implementation.setManager(newManager);
-    }
-
-    //TODO: mudar
     function addTopic(string memory title, string memory description) external {
         return implementation.addTopic(title, description);
     }
@@ -60,6 +55,7 @@ contract CondominiumAdapter {
         return implementation.vote(title, option);
     }
 
+    //TODO: mudar
     function closeVoting(string memory title) external {
         return implementation.closeVoting(title);
     }

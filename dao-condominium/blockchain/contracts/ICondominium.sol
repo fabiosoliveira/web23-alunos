@@ -12,9 +12,6 @@ interface ICondominium {
     function setCounselor(address resident, bool isEntering) external;
 
     //TODO: mudar
-    function setManager(address newManager) external;
-
-    //TODO: mudar
     function addTopic(string memory title, string memory description) external;
 
     //TODO: edit topic

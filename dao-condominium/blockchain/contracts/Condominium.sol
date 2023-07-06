@@ -19,29 +19,27 @@ contract Condominium is ICondominium {
     constructor() {
         manager = msg.sender;
 
-        for (uint8 i = 1; i <= 2; i++) { //os blocos
-            for (uint8 j = 1; j <= 5; j++) { //os andares
-                for (uint8 k = 1; k <= 5; k++) { //as unidades
-                    unchecked {
-                        residences[(i * 1000) + (j * 100) + k] = true;
-                    }
+        for (uint16 i = 1; i <= 2; i++) { //os blocos
+            for (uint16 j = 1; j <= 5; j++) { //os andares
+                for (uint16 k = 1; k <= 5; k++) { //as unidades
+                    residences[(i * 1000) + (j * 100) + k] = true;
                 }
             }
         }
     }
 
     modifier onlyManager() {
-        require(msg.sender == manager, "Only the manager can do this");
+        require(tx.origin == manager, "Only the manager can do this");
         _;
     }
 
     modifier onlyCouncil() {
-        require(msg.sender == manager || counselors[msg.sender], "Only the manager or the council can do this");
+        require(tx.origin == manager || counselors[tx.origin], "Only the manager or the council can do this");
         _;
     }
 
     modifier onlyResidents() {
-        require(msg.sender == manager || isResident(msg.sender), "Only the manager or the residents can do this");
+        require(tx.origin == manager || isResident(tx.origin), "Only the manager or the residents can do this");
         _;
     }
 
@@ -74,11 +72,6 @@ contract Condominium is ICondominium {
         } else {
             delete counselors[resident];
         }
-    }
-
-    function setManager(address newManager) external onlyManager {
-        require(newManager != address(0), "The address must be valid");
-        manager = newManager;
     }
 
     function getTopic(string memory title) public view returns (Lib.Topic memory) {
@@ -129,7 +122,7 @@ contract Condominium is ICondominium {
         require(topic.createdDate > 0, "This topic does not exist");
         require(topic.status == Lib.Status.VOTING, "Only VOTING topics can be voted");
 
-        uint16 residence = residents[msg.sender];
+        uint16 residence = residents[tx.origin];
         bytes32 topicId = keccak256(bytes(title));
 
         Lib.Vote[] memory votes = votings[topicId];
@@ -142,7 +135,7 @@ contract Condominium is ICondominium {
 
         Lib.Vote memory newVote = Lib.Vote({
             residence: residence,
-            resident: msg.sender,
+            resident: tx.origin,
             option: option,
             timestamp: block.timestamp
         });
