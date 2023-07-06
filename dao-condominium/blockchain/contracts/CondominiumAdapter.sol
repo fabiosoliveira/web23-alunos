@@ -34,9 +34,8 @@ contract CondominiumAdapter {
         return implementation.setCounselor(resident, isEntering);
     }
 
-    //TODO: mudar
-    function addTopic(string memory title, string memory description) external {
-        return implementation.addTopic(title, description);
+    function addTopic(string memory title, string memory description, Lib.Category category, uint amount, address responsible) external {
+        return implementation.addTopic(title, description, category, amount, responsible);
     }
 
     //TODO: edit topic

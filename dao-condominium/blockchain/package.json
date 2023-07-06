@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "compile": "hardhat coverage",
+    "compile": "hardhat compile",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "test:watch": "nodemon --ext ts,sol --exec hardhat test",
     "deploy:bsctest": "hardhat run scripts/deploy.ts --network bsctest",
     "verify:bsctest": "hardhat verify --network bsctest 0x027f68782d1146fFd7EFBcE1A82461F4381aAc66"
   },
