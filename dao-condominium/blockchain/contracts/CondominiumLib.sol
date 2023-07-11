@@ -7,7 +7,8 @@ library CondominiumLib {
         IDLE,
         VOTING,
         APPROVED,
-        DENIED
+        DENIED,
+        SPENT
     } // 0, 1, 2, 3
 
     enum Options {
