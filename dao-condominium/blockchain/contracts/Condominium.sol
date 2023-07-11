@@ -233,10 +233,10 @@ contract Condominium is ICondominium {
         payments[residenceId] = block.timestamp;
     }
 
-    function transfer(string memory topic, uint amount) external onlyManager {
+    function transfer(string memory topicTitle, uint amount) external onlyManager {
         require(address(this).balance >= amount, 'Insufficient funds');
 
-        Lib.Topic memory topic = getTopic(topic);
+        Lib.Topic memory topic = getTopic(topicTitle);
         require(topic.status == Lib.Status.APPROVED && topic.category == Lib.Category.SPENT, "Only APPROVED SPENT topics can be used for transfers");
         require(topic.amount >= amount, "The amount must be less or equal the APPROVED topic");
 

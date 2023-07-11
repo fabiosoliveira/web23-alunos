@@ -25,5 +25,5 @@ interface ICondominium {
 
     function payQuota(uint16 residenceId) external payable;
 
-    function transfer(string memory topic, uint amount) external;
+    function transfer(string memory topicTitle, uint amount) external;
 }
