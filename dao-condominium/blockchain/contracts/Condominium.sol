@@ -12,12 +12,16 @@ contract Condominium is ICondominium {
     uint public monthlyQuota = 0.01 ether;
 
     mapping (uint16 => bool) public residences; // unidade => true
-    mapping (address => uint16) public residents; // wallet => unidade (1101) (2505)
-    mapping (address => bool) public counselors; // conselheiro => true
+    Lib.Resident[] public residents;
+    mapping (address => uint) private _residentIndex; // wallet => array index
 
-    mapping (uint16 => uint) public payments; // unidade => último pagamento (timestamp em segundos)
+    address[] public counselors;
 
-    mapping (bytes32 => Lib.Topic) public topics;
+    mapping (uint16 => uint) public nextPayment; // unidade => próximo pagamento (timestamp em segundos)
+
+    Lib.Topic[] public topics;
+    mapping (bytes32 => uint) private _topicIndex; // topic hash => array index
+
     mapping (bytes32 => Lib.Vote[]) public votings;
 
     constructor() {
