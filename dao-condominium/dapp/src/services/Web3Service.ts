@@ -36,7 +36,7 @@ export async function doLogin() {
   const contract = getContract(provider);
 
   const manager = await contract.getManager();
-  const isManager = accounts[0] === manager;
+  const isManager = accounts[0].toUpperCase() === manager.toUpperCase();
 
   if (isManager) {
     localStorage.setItem("profile", Profiler.MANAGER);
@@ -44,10 +44,15 @@ export async function doLogin() {
     localStorage.setItem("profile", Profiler.RESIDENT);
   }
 
-  localStorage.setItem("account", accounts[0]);
+  localStorage.setItem("account", accounts[0].toUpperCase());
 
   return {
     profile: (localStorage.getItem("profile") || Profiler.RESIDENT) as Profiler,
-    account: accounts[0],
+    account: accounts[0].toUpperCase(),
   };
+}
+
+export function doLogout() {
+  localStorage.removeItem("account");
+  localStorage.removeItem("profile");
 }
