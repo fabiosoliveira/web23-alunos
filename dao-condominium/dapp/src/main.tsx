@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import Login from "./Login.tsx";
+import Router from "./Router.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Login />
+    <Router />
   </React.StrictMode>
 );

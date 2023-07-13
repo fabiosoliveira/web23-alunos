@@ -1,4 +1,12 @@
+import { useNavigate } from "react-router-dom";
+
 function Login() {
+  const navigate = useNavigate();
+
+  function btnLoginClick() {
+    navigate("/topics");
+  }
+
   return (
     <main className="main-content  mt-0">
       <div
@@ -29,6 +37,7 @@ function Login() {
                       <button
                         type="button"
                         className="btn bg-gradient-primary w-100 my-4 mb-2"
+                        onClick={btnLoginClick}
                       >
                         <img
                           src="/assets/metamask.svg"
