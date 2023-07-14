@@ -53,7 +53,7 @@ contract Condominium is ICondominium {
             require(isResident(tx.origin), "Only the manager or the residents can do this");
 
             Lib.Resident memory resident = _getResident(tx.origin);
-            require(block.timestamp <= resident.nextPayment, "The resident must be defaulted");
+            require(block.timestamp <= resident.nextPayment, "The resident must be defaulter");
         }
         _;
     }
@@ -125,7 +125,7 @@ contract Condominium is ICondominium {
     }
 
     function addResident(address resident, uint16 residenceId) external onlyCouncil validAddress(resident) {
-        require(residenceExists(residenceId), "This residence does not exist");
+        require(residenceExists(residenceId), "This residence does not exists");
         
         residents.push(Lib.Resident({
             wallet: resident,
@@ -234,7 +234,7 @@ contract Condominium is ICondominium {
 
     function removeTopic(string memory title) external onlyManager returns (Lib.TopicUpdated memory) {
         Lib.Topic memory topic = _getTopic(title);
-        require(topic.createdDate > 0, "This topic does not exist");
+        require(topic.createdDate > 0, "The topic does not exists");
         require(topic.status == Lib.Status.IDLE, "Only IDLE topics can be removed");
         
         bytes32 topicId = keccak256(bytes(title));
@@ -259,7 +259,7 @@ contract Condominium is ICondominium {
 
     function editTopic(string memory topicToEdit, string memory description, uint amount, address responsible) external onlyManager returns (Lib.TopicUpdated memory) {
         Lib.Topic memory topic = _getTopic(topicToEdit);
-        require(topic.createdDate > 0, "This topic does not exist");
+        require(topic.createdDate > 0, "The topic does not exists");
         require(topic.status == Lib.Status.IDLE, "Only IDLE topics can be edited");
 
         bytes32 topicId = keccak256(bytes(topicToEdit));
@@ -303,7 +303,7 @@ contract Condominium is ICondominium {
     // VOTING FUNCTIONS
     function openVoting(string memory title) external onlyManager returns (Lib.TopicUpdated memory) {
         Lib.Topic memory topic = _getTopic(title);
-        require(topic.createdDate > 0, "This topic does not exist");
+        require(topic.createdDate > 0, "The topic does not exists");
         require(topic.status == Lib.Status.IDLE, "Only IDLE topics can be open for voting");
 
         bytes32 topicId = keccak256(bytes(title));
@@ -323,7 +323,7 @@ contract Condominium is ICondominium {
         require(option != Lib.Options.EMPTY, "The option cannot be EMPTY");
 
         Lib.Topic memory topic = _getTopic(title);
-        require(topic.createdDate > 0, "This topic does not exist");
+        require(topic.createdDate > 0, "The topic does not exists");
         require(topic.status == Lib.Status.VOTING, "Only VOTING topics can be voted");
 
         uint16 residence = residents[_residentIndex[tx.origin]].residence;
@@ -349,7 +349,7 @@ contract Condominium is ICondominium {
 
     function closeVoting(string memory title) external onlyManager returns (Lib.TopicUpdated memory) {
         Lib.Topic memory topic = _getTopic(title);
-        require(topic.createdDate > 0, "This topic does not exist");
+        require(topic.createdDate > 0, "The topic does not exists");
         require(topic.status == Lib.Status.VOTING, "Only VOTING topics can be closed");
 
         uint8 minimunVotes = 5;
@@ -421,7 +421,7 @@ contract Condominium is ICondominium {
 
     // PAYMENT FUNCTIONS
     function payQuota(uint16 residenceId) external payable {
-        require(residenceExists(residenceId), "The residence does not exist");
+        require(residenceExists(residenceId), "The residence does not exists");
         require(msg.value >= monthlyQuota, "Wrong value");
         require(block.timestamp > _nextPayment[residenceId], "You cannot pay twice a month");
 

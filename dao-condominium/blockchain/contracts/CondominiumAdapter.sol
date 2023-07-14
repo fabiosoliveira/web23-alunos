@@ -33,6 +33,7 @@ contract CondominiumAdapter {
     
     function upgrade(address newImplementation) external{
         require(owner == msg.sender, "You do not have permission");
+        require(newImplementation != address(0), "Invalid address");
         implementation = ICondominium(newImplementation);
     }
 
