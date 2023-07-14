@@ -17,12 +17,14 @@ contract Condominium is ICondominium {
 
     address[] public counselors;
 
-    mapping (uint16 => uint) public nextPayment; // unidade => próximo pagamento (timestamp em segundos)
+    mapping (uint16 => uint) private _nextPayment; // unidade => próximo pagamento (timestamp em segundos)
 
     Lib.Topic[] public topics;
     mapping (bytes32 => uint) private _topicIndex; // topic hash => array index
 
-    mapping (bytes32 => Lib.Vote[]) public votings;
+    mapping (bytes32 => Lib.Vote[]) private _votings;
+
+    uint private constant _thirtyDays = 30 * 24 * 60 * 60;
 
     constructor() {
         manager = msg.sender;
@@ -51,7 +53,7 @@ contract Condominium is ICondominium {
             require(isResident(tx.origin), "Only the manager or the residents can do this");
 
             Lib.Resident memory resident = _getResident(tx.origin);
-            require(block.timestamp <= nextPayment[resident.residence], "The resident must be defaulted");
+            require(block.timestamp <= resident.nextPayment, "The resident must be defaulted");
         }
         _;
     }
@@ -84,14 +86,18 @@ contract Condominium is ICondominium {
         uint index = _residentIndex[resident];
         if(index < residents.length){
             Lib.Resident memory result = residents[index];
-            if(result.wallet == resident) return result;
+            if(result.wallet == resident) {
+                result.nextPayment = _nextPayment[result.residence];
+                return result;
+            }
         }
 
         return Lib.Resident({
             wallet: address(0),
             residence: 0,
             isCounselor: false,
-            isManager: false
+            isManager: false,
+            nextPayment: 0
         });
     }
 
@@ -105,7 +111,7 @@ contract Condominium is ICondominium {
         uint index = 0;
 
         for (uint i = skip; i < (skip + pageSize) && i < residents.length; i++) {
-            result[index++] = residents[i];
+            result[index++] = _getResident(residents[i].wallet);
         }
 
         return Lib.ResidentPage({
@@ -125,7 +131,8 @@ contract Condominium is ICondominium {
             wallet: resident,
             residence: residenceId,
             isCounselor: false,
-            isManager: resident == manager
+            isManager: resident == manager,
+            nextPayment: 0
         }));
 
         _residentIndex[resident] = residents.length - 1;
@@ -322,7 +329,7 @@ contract Condominium is ICondominium {
         uint16 residence = residents[_residentIndex[tx.origin]].residence;
         bytes32 topicId = keccak256(bytes(title));
 
-        Lib.Vote[] memory votes = votings[topicId];
+        Lib.Vote[] memory votes = _votings[topicId];
 
         for (uint8 i = 0; i < votes.length; i++) {
             require(votes[i].residence != residence, "A residence should vote only once");
@@ -335,7 +342,7 @@ contract Condominium is ICondominium {
             timestamp: block.timestamp
         });
 
-        votings[topicId].push(newVote);
+        _votings[topicId].push(newVote);
     }
 
     
@@ -361,7 +368,7 @@ contract Condominium is ICondominium {
         uint8 denied = 0;
         uint8 abstention = 0;
         bytes32 topicId = keccak256(bytes(title));
-        Lib.Vote[] memory votes = votings[topicId];
+        Lib.Vote[] memory votes = _votings[topicId];
 
         for (uint8 i = 0; i < votes.length; i++) {
             if (votes[i].option == Lib.Options.YES) {
@@ -405,20 +412,23 @@ contract Condominium is ICondominium {
 
     function numberOfVotes(string memory title) public view returns (uint256) {
         bytes32 topicId = keccak256(bytes(title));
-        return votings[topicId].length;
+        return _votings[topicId].length;
+    }
+
+    function getVotes(string memory topicTitle) external view returns (Lib.Vote[] memory) {
+       return _votings[keccak256(bytes(topicTitle))]; 
     }
 
     // PAYMENT FUNCTIONS
     function payQuota(uint16 residenceId) external payable {
         require(residenceExists(residenceId), "The residence does not exist");
         require(msg.value >= monthlyQuota, "Wrong value");
-        require(block.timestamp > nextPayment[residenceId], "You cannot pay twice a month");
+        require(block.timestamp > _nextPayment[residenceId], "You cannot pay twice a month");
 
-        uint thirtyDays = 30 * 24 * 60 * 60;
-        if(nextPayment[residenceId] == 0){
-            nextPayment[residenceId] = block.timestamp + thirtyDays;
+        if(_nextPayment[residenceId] == 0){
+            _nextPayment[residenceId] = block.timestamp + _thirtyDays;
         } else {
-            nextPayment[residenceId] += thirtyDays;
+            _nextPayment[residenceId] += _thirtyDays;
         }
     }
 

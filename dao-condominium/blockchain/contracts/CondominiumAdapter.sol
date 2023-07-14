@@ -116,4 +116,8 @@ contract CondominiumAdapter {
     function getTopics(uint page, uint pageSize) external view upgraded returns (Lib.TopicPage memory){
         return implementation.getTopics(page, pageSize);
     }
+
+    function getVotes(string memory topicTitle) external view upgraded returns (Lib.Vote[] memory) {
+        return implementation.getVotes(topicTitle);
+    }
 }
