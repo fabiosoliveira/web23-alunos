@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import ABI from "./ABI.json";
-import { ContractContext, TypesAbi } from "./types-abi";
+import { ContractContext } from "./types-abi";
 
 const ADAPTER_ADDRESS = import.meta.env.VITE_APP_ADAPTER_ADDRESS as string;
 
@@ -35,16 +35,27 @@ export async function doLogin() {
 
   const contract = getContract(provider);
 
-  const manager = await contract.getManager();
-  const isManager = accounts[0].toUpperCase() === manager.toUpperCase();
+  const resident = await contract.getResident(accounts[0]);
+  let isManager = resident.isManager;
+
+  if (!isManager && resident.residence > 0) {
+    if (resident.isCounselor) {
+      localStorage.setItem("profile", Profiler.COUNSELOR);
+    } else {
+      localStorage.setItem("profile", Profiler.RESIDENT);
+    }
+  } else if (!isManager && !resident.residence) {
+    const manage = await contract.getManager();
+    isManager = manage.toUpperCase() === accounts[0].toUpperCase();
+  }
 
   if (isManager) {
     localStorage.setItem("profile", Profiler.MANAGER);
-  } else {
-    localStorage.setItem("profile", Profiler.RESIDENT);
+  } else if (localStorage.getItem("profile") === null) {
+    throw new Error("Unoutorized");
   }
 
-  localStorage.setItem("account", accounts[0].toUpperCase());
+  localStorage.setItem("account", accounts[0]);
 
   return {
     profile: (localStorage.getItem("profile") || Profiler.RESIDENT) as Profiler,

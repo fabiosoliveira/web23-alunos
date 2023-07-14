@@ -74,6 +74,11 @@ export type TypesAbiMethodNames =
   | 'getAddress'
   | 'getManager'
   | 'getQuota'
+  | 'getResident'
+  | 'getResidents'
+  | 'getTopic'
+  | 'getTopics'
+  | 'getVotes'
   | 'openVoting'
   | 'owner'
   | 'payQuota'
@@ -98,6 +103,92 @@ export interface TransferEventEmittedResponse {
   to: string;
   amount: BigNumberish;
   topic: string;
+}
+export interface ResidentResponse {
+  wallet: string;
+  0: string;
+  residence: number;
+  1: number;
+  isCounselor: boolean;
+  2: boolean;
+  isManager: boolean;
+  3: boolean;
+  nextPayment: BigNumber;
+  4: BigNumber;
+}
+export interface ResidentsResponse {
+  wallet: string;
+  0: ResidentsResponse[];
+  residence: number;
+  1: ResidentsResponse[];
+  isCounselor: boolean;
+  2: ResidentsResponse[];
+  isManager: boolean;
+  3: ResidentsResponse[];
+  nextPayment: BigNumber;
+  4: ResidentsResponse[];
+}
+export interface ResidentpageResponse {
+  residents: ResidentsResponse[];
+  0: ResidentsResponse[];
+  total: BigNumber;
+  1: BigNumber;
+}
+export interface TopicResponse {
+  title: string;
+  0: string;
+  description: string;
+  1: string;
+  status: number;
+  2: number;
+  createdDate: BigNumber;
+  3: BigNumber;
+  startDate: BigNumber;
+  4: BigNumber;
+  endDate: BigNumber;
+  5: BigNumber;
+  category: number;
+  6: number;
+  amount: BigNumber;
+  7: BigNumber;
+  responsible: string;
+  8: string;
+}
+export interface TopicsResponse {
+  title: string;
+  0: TopicsResponse[];
+  description: string;
+  1: TopicsResponse[];
+  status: number;
+  2: TopicsResponse[];
+  createdDate: BigNumber;
+  3: TopicsResponse[];
+  startDate: BigNumber;
+  4: TopicsResponse[];
+  endDate: BigNumber;
+  5: TopicsResponse[];
+  category: number;
+  6: TopicsResponse[];
+  amount: BigNumber;
+  7: TopicsResponse[];
+  responsible: string;
+  8: TopicsResponse[];
+}
+export interface TopicpageResponse {
+  topics: TopicsResponse[];
+  0: TopicsResponse[];
+  total: BigNumber;
+  1: BigNumber;
+}
+export interface VoteResponse {
+  resident: string;
+  0: string;
+  residence: number;
+  1: number;
+  option: number;
+  2: number;
+  timestamp: BigNumber;
+  3: BigNumber;
 }
 export interface TypesAbi {
   /**
@@ -188,6 +279,65 @@ export interface TypesAbi {
    * Type: function
    */
   getQuota(overrides?: ContractCallOverrides): Promise<BigNumber>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param resident Type: address, Indexed: false
+   */
+  getResident(
+    resident: string,
+    overrides?: ContractCallOverrides
+  ): Promise<ResidentResponse>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param page Type: uint256, Indexed: false
+   * @param pageSize Type: uint256, Indexed: false
+   */
+  getResidents(
+    page: BigNumberish,
+    pageSize: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<ResidentpageResponse>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param title Type: string, Indexed: false
+   */
+  getTopic(
+    title: string,
+    overrides?: ContractCallOverrides
+  ): Promise<TopicResponse>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param page Type: uint256, Indexed: false
+   * @param pageSize Type: uint256, Indexed: false
+   */
+  getTopics(
+    page: BigNumberish,
+    pageSize: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<TopicpageResponse>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param topicTitle Type: string, Indexed: false
+   */
+  getVotes(
+    topicTitle: string,
+    overrides?: ContractCallOverrides
+  ): Promise<VoteResponse[]>;
   /**
    * Payable: false
    * Constant: false

@@ -51,3 +51,27 @@ function ManagerRoute({ children }: Props) {
   doLogout();
   return <Navigate to="/" />;
 }
+
+function CouncilRoute({ children }: Props) {
+  const isAuth = localStorage.getItem("account") !== null;
+  const isResident =
+    (localStorage.getItem("profile") || Profiler.RESIDENT) ===
+    Profiler.RESIDENT;
+
+  if (isAuth && !isResident) return children;
+
+  doLogout();
+  return <Navigate to="/" />;
+}
+
+function ResidentRoute({ children }: Props) {
+  const isAuth = localStorage.getItem("account") !== null;
+  const isResident =
+    (localStorage.getItem("profile") || Profiler.RESIDENT) ===
+    Profiler.RESIDENT;
+
+  if (isAuth && isResident) return children;
+
+  doLogout();
+  return <Navigate to="/" />;
+}
