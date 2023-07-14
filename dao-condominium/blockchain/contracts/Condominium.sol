@@ -138,12 +138,37 @@ contract Condominium is ICondominium {
         return false;
     }
 
-    function setCounselor(address resident, bool isEntering) external onlyManager validAddress(resident) {
+    function _addCouncelor(address counselor) private onlyManager validAddress(counselor) {
+        require(isResident(counselor), "The counselor must be a resident");
+        counselors.push(counselor);
+        residents[_residentIndex[counselor]].isCounselor = true;
+    }
+
+    function _removeCouncelor(address counselor) private onlyManager validAddress(counselor) {
+        uint index = 1000000;
+        for (uint i = 0; i < counselors.length; i++) {
+            if(counselors[i] == counselor) {
+                index = i;
+                break;
+            }
+        }
+
+        require(index != 1000000, "Counselor not found");
+
+        if(index != counselors.length - 1){
+            address latest = counselors[counselors.length - 1];
+            counselors[index] = latest;
+        }
+
+        counselors.pop();
+        residents[_residentIndex[counselor]].isCounselor = false;
+    }
+
+    function setCounselor(address resident, bool isEntering) external {
         if (isEntering) {
-            require(isResident(resident), "This counselor must be a resident");
-            counselors[resident] = true;
+            _addCouncelor(resident);
         } else {
-            delete counselors[resident];
+            _removeCouncelor(resident);
         }
     }
 
