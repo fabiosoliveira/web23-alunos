@@ -1,11 +1,39 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import Footer from "../../components/Footer";
 import Sidebar from "../../components/Sidebar";
 import SwitchInput from "../../components/SwitchInput";
+import { Resident, addResident, isManager } from "../../services/Web3Service";
+import { useNavigate } from "react-router-dom";
+
+const RESIDENT_INITIAL_STATE = {
+  isCounselor: false,
+  isManager: false,
+  // nextPayment: 0,
+  residence: 0,
+  wallet: "",
+} as Resident;
 
 function ResidentPage() {
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [resident, setResident] = useState<Resident>(RESIDENT_INITIAL_STATE);
+
+  function onResidentChange(event: ChangeEvent<HTMLInputElement>): void {
+    const { id, value } = event.target;
+    setResident((resident) => ({ ...resident, [id]: value }));
+  }
+
+  function btnSaveClick() {
+    if (!resident.wallet) return;
+
+    setMessage("Connecting to wallet...wait...");
+    addResident(resident.wallet, resident.residence)
+      .then((tx) => navigate("/residents?tx=" + tx.hash))
+      .catch((err) => {
+        if (err instanceof Error) setMessage(err.message);
+      });
+  }
 
   return (
     <>
@@ -47,8 +75,9 @@ function ResidentPage() {
                             type="text"
                             className="form-control"
                             id="wallet"
-                            value=""
+                            value={resident.wallet}
                             placeholder="0x00..."
+                            onChange={onResidentChange}
                           />
                         </div>
                       </div>
@@ -63,28 +92,37 @@ function ResidentPage() {
                             type="number"
                             className="form-control"
                             id="residence"
-                            value=""
+                            value={resident.residence}
                             placeholder="1101"
+                            onChange={onResidentChange}
                           />
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="row ms-3">
-                    <div className="col-md-6 mb-3">
-                      <div className="form-group">
-                        <SwitchInput
-                          id="isCouncelor"
-                          isChecked={true}
-                          text="Is Councelor"
-                          onChange={() => {}}
-                        />
+                  {isManager() ? (
+                    <div className="row ms-3">
+                      <div className="col-md-6 mb-3">
+                        <div className="form-group">
+                          <SwitchInput
+                            id="isCounselor"
+                            isChecked={resident.isCounselor}
+                            text="Is Counselor?"
+                            onChange={onResidentChange}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    <></>
+                  )}
+
                   <div className="row ms-3">
                     <div className="col-md-12 mb-3">
-                      <button className="btn bg-gradient-dark me-2">
+                      <button
+                        className="btn bg-gradient-dark me-2"
+                        onClick={btnSaveClick}
+                      >
                         <i className="material-icons opacity-10 me-2">save</i>
                         Save Settings
                       </button>

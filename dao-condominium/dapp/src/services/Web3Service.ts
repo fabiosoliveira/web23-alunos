@@ -10,6 +10,14 @@ export enum Profiler {
   MANAGER = "MANAGER",
 }
 
+export type Resident = {
+  wallet: string;
+  isCounselor: boolean;
+  isManager: boolean;
+  residence: number;
+  nextPayment: ethers.BigNumberish;
+};
+
 function getProfile() {
   const profile = localStorage.getItem("profile") || Profiler.RESIDENT;
   return profile;
@@ -98,4 +106,16 @@ export async function upgrade(address: string) {
 
   const contract = getContractSigner();
   return contract.upgrade(address);
+}
+
+export async function addResident(wallet: string, residenceId: number) {
+  if (getProfile() === Profiler.RESIDENT)
+    throw new Error("You do not have permission.");
+
+  const contract = getContractSigner();
+  return contract.addResident(wallet, residenceId);
+}
+
+export function isManager() {
+  return getProfile() === Profiler.MANAGER;
 }

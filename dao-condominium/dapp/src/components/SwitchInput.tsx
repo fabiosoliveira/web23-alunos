@@ -1,34 +1,30 @@
-import { ChangeEvent, ChangeEventHandler } from "react";
+import React from "react";
 
 type Props = {
   id: string;
   text: string;
   isChecked: boolean;
-  onChange: ChangeEventHandler<HTMLInputElement>;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
 };
 
 /**
- * Renders a switch input component.
- *
- * @param {Props} id - The ID of the input element.
- * @param {Props} text - The text to be displayed next to the switch.
- * @param {Props} isChecked - The initial checked state of the switch.
- * @param {Props} onChange - The callback function called when the switch is toggled.
- * @return {JSX.Element} The rendered switch input component.
+ * props
+ * - id
+ * - text
+ * - isChecked
+ * - onChange
  */
-function SwitchInput({ id, text, isChecked, onChange }: Props) {
-  function onSwitchChange(event: ChangeEvent<HTMLInputElement>): void {
-    const isChecked = event.target.value === "true";
-    event.target.value = `${!isChecked}`;
-    onChange(event);
+function SwitchInput(props: Props) {
+  function onSwitchChange(evt: React.ChangeEvent<HTMLInputElement>) {
+    const isChecked = evt.target.value === "true";
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    evt.target.value = `${!isChecked}`;
+    props.onChange(evt);
   }
 
-  function getIsChecked(isChecked: boolean): boolean | undefined {
-    if (typeof isChecked === "string") {
-      return isChecked === "true";
-    } else {
-      return isChecked;
-    }
+  function getIsChecked(): boolean {
+    if (typeof props.isChecked === "string") return props.isChecked === "true";
+    else return props.isChecked;
   }
 
   return (
@@ -36,12 +32,12 @@ function SwitchInput({ id, text, isChecked, onChange }: Props) {
       <input
         className="form-check-input"
         type="checkbox"
-        id={id}
-        checked={getIsChecked(isChecked)}
+        id={props.id}
+        checked={getIsChecked() || false}
         onChange={onSwitchChange}
       />
-      <label className="form-check-label mb-0 ms-3" htmlFor={id}>
-        {text}
+      <label className="form-check-label mb-0 ms-3" htmlFor={props.id}>
+        {props.text}
       </label>
     </div>
   );
