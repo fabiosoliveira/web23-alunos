@@ -10,6 +10,11 @@ export enum Profiler {
   MANAGER = "MANAGER",
 }
 
+function getProfile() {
+  const profile = localStorage.getItem("profile") || Profiler.RESIDENT;
+  return profile;
+}
+
 function getProvider(): ethers.providers.Web3Provider {
   if (!window.ethereum) throw new Error("No MetaMask found");
 
@@ -23,6 +28,19 @@ function getContract(provider?: ethers.providers.Web3Provider) {
     ABI,
     provider
   ) as unknown as ContractContext;
+}
+
+function getContractSigner(provider?: ethers.providers.Web3Provider) {
+  if (!provider) provider = getProvider();
+  const signer = provider.getSigner(
+    localStorage.getItem("account") || undefined
+  );
+  const contract = new ethers.Contract(
+    ADAPTER_ADDRESS,
+    ABI,
+    provider
+  ) as unknown as ContractContext;
+  return contract.connect(signer);
 }
 
 export async function doLogin() {
@@ -66,4 +84,18 @@ export async function doLogin() {
 export function doLogout() {
   localStorage.removeItem("account");
   localStorage.removeItem("profile");
+}
+
+export async function getAddress() {
+  const contract = getContract();
+
+  return contract.getAddress();
+}
+
+export async function upgrade(address: string) {
+  if (getProfile() !== Profiler.MANAGER)
+    throw new Error("You do not have permission.");
+
+  const contract = getContractSigner();
+  return contract.upgrade(address);
 }
