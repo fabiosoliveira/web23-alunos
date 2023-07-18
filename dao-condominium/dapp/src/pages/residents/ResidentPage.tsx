@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Footer from "../../components/Footer";
 import Sidebar from "../../components/Sidebar";
+import SwitchInput from "../../components/SwitchInput";
 
 function ResidentPage() {
   const [message, setMessage] = useState("");
@@ -66,6 +67,18 @@ function ResidentPage() {
                             placeholder="1101"
                           />
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row ms-3">
+                    <div className="col-md-6 mb-3">
+                      <div className="form-group">
+                        <SwitchInput
+                          id="isCouncelor"
+                          isChecked={true}
+                          text="Is Councelor"
+                          onChange={() => {}}
+                        />
                       </div>
                     </div>
                   </div>
