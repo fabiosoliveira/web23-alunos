@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Topics from "./pages/Topics";
 import Transfer from "./pages/Transfer";
 import { Profiler, doLogout } from "./services/Web3Service";
+import Settings from "./pages/Settings";
 
 function Router() {
   return (
@@ -22,6 +23,14 @@ function Router() {
           element={
             <ManagerRoute>
               <Transfer />
+            </ManagerRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ManagerRoute>
+              <Settings />
             </ManagerRoute>
           }
         />
