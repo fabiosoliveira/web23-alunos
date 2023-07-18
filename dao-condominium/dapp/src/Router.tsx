@@ -4,6 +4,8 @@ import Topics from "./pages/Topics";
 import Transfer from "./pages/Transfer";
 import { Profiler, doLogout } from "./services/Web3Service";
 import Settings from "./pages/Settings";
+import Residents from "./pages/residents";
+import ResidentPage from "./pages/residents/ResidentPage";
 
 function Router() {
   return (
@@ -32,6 +34,22 @@ function Router() {
             <ManagerRoute>
               <Settings />
             </ManagerRoute>
+          }
+        />
+        <Route
+          path="/residents/new"
+          element={
+            <CouncilRoute>
+              <ResidentPage />
+            </CouncilRoute>
+          }
+        />
+        <Route
+          path="/residents"
+          element={
+            <CouncilRoute>
+              <Residents />
+            </CouncilRoute>
           }
         />
       </Routes>
