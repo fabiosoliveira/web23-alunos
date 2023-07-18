@@ -1,5 +1,12 @@
+import Sidebar from "../components/Sidebar";
+
 function Topics() {
-  return <div>Hello Topics</div>;
+  return (
+    <>
+      <Sidebar />
+      <div>Hello Topics</div>
+    </>
+  );
 }
 
 export default Topics;
