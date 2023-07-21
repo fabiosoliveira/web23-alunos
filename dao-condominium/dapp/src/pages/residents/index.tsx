@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Alert from "../../components/Alert";
 import Footer from "../../components/Footer";
 import Sidebar from "../../components/Sidebar";
-import { Resident, getResidents } from "../../services/Web3Service";
+import {
+  Resident,
+  getResidents,
+  removeResident,
+} from "../../services/Web3Service";
 import ResidentRow from "./ResidentRow";
+import If from "../../components/If";
+import Loader from "../../components/Loader";
 
 function Residents() {
+  const navigate = useNavigate();
+
   const [residents, setResidents] = useState<Resident[]>([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -37,6 +45,18 @@ function Residents() {
     }
   }, []);
 
+  function onDeleteResident(wallet: string): void {
+    setIsLoading(true);
+    setMessage("");
+    setError("");
+    removeResident(wallet)
+      .then((tx) => navigate("/residents?tx=" + tx.hash))
+      .catch((err) => {
+        if (err instanceof Error) setError(err.message);
+      })
+      .finally(() => setIsLoading(false));
+  }
+
   return (
     <>
       <Sidebar />
@@ -54,40 +74,26 @@ function Residents() {
                   </div>
                 </div>
                 <div className="card-body px-0 pb-2">
-                  {message ? (
+                  <If condition={message}>
                     <Alert
                       alertClass="alert-success"
                       materialIcon="thumb_up_off_alt"
                       title="Success!"
                       text={message}
                     />
-                  ) : (
-                    <></>
-                  )}
-                  {error ? (
+                  </If>
+
+                  <If condition={error}>
                     <Alert
                       alertClass="alert-danger"
                       materialIcon="error"
                       title="Error!"
                       text={error}
                     />
-                  ) : (
-                    <></>
-                  )}
-                  {isLoading ? (
-                    <div className="row ms-3">
-                      <div className="col-md-6 mb-3">
-                        <p>
-                          <i className="material-icons opacity-10 me-2">
-                            hourglass_empty
-                          </i>
-                          Loading...
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <></>
-                  )}
+                  </If>
+                  <If condition={isLoading}>
+                    <Loader />
+                  </If>
                   <div className="table-responsive p-0">
                     <table className="table align-items-center mb-0">
                       <thead>
@@ -108,17 +114,15 @@ function Residents() {
                         </tr>
                       </thead>
                       <tbody>
-                        {residents && residents.length ? (
-                          residents.map((resident) => (
+                        <If condition={residents.length}>
+                          {residents.map((resident) => (
                             <ResidentRow
                               key={resident.wallet}
                               data={resident}
-                              onDelete={(wallet) => alert(wallet)}
+                              onDelete={() => onDeleteResident(resident.wallet)}
                             />
-                          ))
-                        ) : (
-                          <></>
-                        )}
+                          ))}
+                        </If>
                       </tbody>
                     </table>
                   </div>

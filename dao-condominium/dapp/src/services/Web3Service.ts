@@ -133,6 +133,10 @@ export async function upgrade(address: string) {
   return contract.upgrade(address);
 }
 
+export function isManager() {
+  return getProfile() === Profiler.MANAGER;
+}
+
 export async function addResident(wallet: string, residenceId: number) {
   if (getProfile() === Profiler.RESIDENT)
     throw new Error("You do not have permission.");
@@ -141,6 +145,10 @@ export async function addResident(wallet: string, residenceId: number) {
   return contract.addResident(wallet, residenceId);
 }
 
-export function isManager() {
-  return getProfile() === Profiler.MANAGER;
+export async function removeResident(wallet: string) {
+  if (getProfile() !== Profiler.MANAGER)
+    throw new Error("You do not have permission.");
+
+  const contract = getContractSigner();
+  return contract.removeResident(wallet);
 }
