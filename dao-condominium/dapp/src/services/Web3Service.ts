@@ -100,6 +100,31 @@ export async function getAddress() {
   return contract.getAddress();
 }
 
+export type ResidentPage = {
+  residents: Resident[];
+  total: number;
+};
+
+export async function getResidents(
+  page = 1,
+  pageSize = 10
+): Promise<ResidentPage> {
+  const contract = getContract();
+
+  const result = await contract.getResidents(page, pageSize);
+  const residents = result.residents
+    .filter((r) => r.residence)
+    .sort((a, b) => {
+      if (a.residence > b.residence) return 1;
+      return -1;
+    });
+
+  return {
+    residents,
+    total: ethers.BigNumber.from(result.total).toNumber(),
+  };
+}
+
 export async function upgrade(address: string) {
   if (getProfile() !== Profiler.MANAGER)
     throw new Error("You do not have permission.");
