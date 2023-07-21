@@ -1,7 +1,28 @@
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import Alert from "../../components/Alert";
 import Footer from "../../components/Footer";
 import Sidebar from "../../components/Sidebar";
 
 function Residents() {
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  function useQuery() {
+    return new URLSearchParams(useLocation().search);
+  }
+
+  const query = useQuery();
+
+  useEffect(() => {
+    const tx = query.get("tx");
+    if (tx) {
+      setMessage(
+        "Your transaction is being processed. It may take some minuts to have effect."
+      );
+    }
+  }, []);
+
   return (
     <>
       <Sidebar />
@@ -19,6 +40,26 @@ function Residents() {
                   </div>
                 </div>
                 <div className="card-body px-0 pb-2">
+                  {message ? (
+                    <Alert
+                      alertClass="alert-success"
+                      materialIcon="thumb_up_off_alt"
+                      title="Success!"
+                      text={message}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                  {error ? (
+                    <Alert
+                      alertClass="alert-danger"
+                      materialIcon="error"
+                      title="Error!"
+                      text={error}
+                    />
+                  ) : (
+                    <></>
+                  )}
                   <div className="table-responsive p-0">
                     <table className="table align-items-center mb-0">
                       <thead>
