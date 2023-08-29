@@ -11,6 +11,8 @@ import {
 import ResidentRow from "./ResidentRow";
 import If from "../../components/If";
 import Loader from "../../components/Loader";
+import Pagination from "../../components/Pagination";
+import { ethers } from "ethers";
 
 function Residents() {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ function Residents() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [count, setCount] = useState(ethers.BigNumber.from(0));
 
   function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -28,9 +31,10 @@ function Residents() {
 
   useEffect(() => {
     setIsLoading(true);
-    getResidents()
+    getResidents(parseInt(query.get("page") || "1"))
       .then((result) => {
         setResidents(result.residents);
+        setCount(result.total);
       })
       .catch((err) => {
         if (err instanceof Error) setError(err.message);
@@ -125,8 +129,9 @@ function Residents() {
                         </If>
                       </tbody>
                     </table>
+                    <Pagination count={count} pageSize={10} />
                   </div>
-                  <div className="row ms-3">
+                  <div className="row ms-2">
                     <div className="col-md-12 mb-3">
                       <a
                         className="btn bg-gradient-dark me-2"

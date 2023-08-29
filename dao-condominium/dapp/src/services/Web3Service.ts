@@ -102,7 +102,7 @@ export async function getAddress() {
 
 export type ResidentPage = {
   residents: Resident[];
-  total: number;
+  total: ethers.BigNumber;
 };
 
 export async function getResidents(
@@ -121,7 +121,7 @@ export async function getResidents(
 
   return {
     residents,
-    total: ethers.BigNumber.from(result.total).toNumber(),
+    total: ethers.BigNumber.from(result.total),
   };
 }
 
