@@ -1,0 +1,28 @@
+### Get Health check
+GET http://localhost:3001/
+
+### Get residents by wallet
+GET http://localhost:3001/residents/0xF357fBCE8c00da01eeF37670413F5f2c2aB64191
+
+### Post resident
+POST http://localhost:3001/residents/
+Content-Type: application/json
+
+{
+    "wallet": "0xF357fBCE8c00da01eeF37670413F5f2c2aB64191",
+    "name": "Manager",
+    "profile": "2",
+    "phone": "+5575988223930",
+    "email": "fabio_net1000@hotmail.com"
+}
+
+### Delete resident
+DELETE http://localhost:3001/residents/123
+
+### Patch resident
+PATCH http://localhost:3001/residents/0xF357fBCE8c00da01eeF37670413F5f2c2aB64191
+Content-Type: application/json
+
+{
+    "name": "Condominium Manager"
+}

@@ -1,8 +1,13 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { MongoClient, Db, ServerApiVersion } from "mongodb";
 
 let singleton: Db;
 
-const uri_connection = process.env.MONGO_CONNECTION as string;
+const username = encodeURIComponent(process.env.MONGO_USER as string);
+const password = encodeURIComponent(process.env.MONGO_PASSWORD as string);
+
+const uri_connection = `mongodb+srv://${username}:${password}@fabioteste.7iby2.mongodb.net/?retryWrites=true&w=majority`;
 const db_name = process.env.MONGO_DATABASE as string;
 
 export default async (): Promise<Db> => {
