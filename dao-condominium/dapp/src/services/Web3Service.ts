@@ -103,6 +103,7 @@ export async function doLogin() {
 export function doLogout() {
   localStorage.removeItem("account");
   localStorage.removeItem("profile");
+  localStorage.removeItem("token");
 }
 
 export async function getAddress() {
