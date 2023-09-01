@@ -4,6 +4,7 @@ import "express-async-errors";
 import cors from "cors";
 import helmet from "helmet";
 import errorMiddleware from "./middlewares/errorMiddleware";
+import authenticationMiddleware from "./middlewares/authenticationMiddleware";
 import residentRouter from "./routers/residentRouter";
 import authController from "./controllers/authController";
 
@@ -20,7 +21,7 @@ app.use(
 app.use(express.json());
 
 app.post("/login/", authController.doLogin);
-app.use("/residents/", residentRouter);
+app.use("/residents/", authenticationMiddleware, residentRouter);
 
 app.use("/", (req: Request, res: Response) => {
   res.send("Health check");
