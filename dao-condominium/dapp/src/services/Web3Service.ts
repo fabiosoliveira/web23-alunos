@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import ABI from "./ABI.json";
 import { ContractContext } from "./types-abi";
+import { doApiLogin } from "./ApiService";
 
 const ADAPTER_ADDRESS = import.meta.env.VITE_APP_ADAPTER_ADDRESS as string;
 
@@ -83,7 +84,17 @@ export async function doLogin() {
 
   localStorage.setItem("account", accounts[0]);
 
+  const signer = provider.getSigner();
+  const timestamp = Date.now();
+  const message = `Authenticating to Condominium. Timestamp: ${timestamp}`;
+  const secret = await signer.signMessage(message);
+  console.log(secret);
+
+  const token = await doApiLogin(accounts[0], secret, timestamp);
+  localStorage.setItem("token", token);
+
   return {
+    token,
     profile: (localStorage.getItem("profile") || Profiler.RESIDENT) as Profiler,
     account: accounts[0].toUpperCase(),
   };
