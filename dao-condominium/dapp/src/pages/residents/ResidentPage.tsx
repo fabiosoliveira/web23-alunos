@@ -34,7 +34,7 @@ function ResidentPage() {
   const { wallet } = useParams();
 
   const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [resident, setResident] = useState<Resident>(RESIDENT_INITIAL_STATE);
   const [apiResident, setApiResident] = useState<ApiResident>(
     {} as ApiResident
@@ -109,24 +109,20 @@ function ResidentPage() {
     }
 
     if (wallet) {
-      setIsLoading(2);
-      getResident(wallet)
-        .then((resident) => {
-          setResident(resident);
-        })
-        .catch((err) => {
-          if (err instanceof Error) setMessage(err.message);
-        })
-        .finally(() => setIsLoading((state) => state - 1));
+      setIsLoading(true);
 
-      getApiResident(wallet)
-        .then((apiResident) => {
-          setApiResident(apiResident);
+      const promiseBlockchain = getResident(wallet);
+      const promiseBackend = getApiResident(wallet);
+
+      Promise.all([promiseBlockchain, promiseBackend])
+        .then((results) => {
+          setResident(results[0]);
+          setApiResident(results[1]);
         })
         .catch((err) => {
           if (err instanceof Error) setMessage(err.message);
         })
-        .finally(() => setIsLoading((state) => state - 1));
+        .finally(() => setIsLoading(false));
     }
   }, [wallet]);
 

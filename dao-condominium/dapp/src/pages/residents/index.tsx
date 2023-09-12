@@ -8,6 +8,7 @@ import {
   getResidents,
   removeResident,
 } from "../../services/Web3Service";
+import { deletApiResident } from "../../services/ApiService";
 import ResidentRow from "./ResidentRow";
 import If from "../../components/If";
 import Loader from "../../components/Loader";
@@ -53,8 +54,11 @@ function Residents() {
     setIsLoading(true);
     setMessage("");
     setError("");
-    removeResident(wallet)
-      .then((tx) => navigate("/residents?tx=" + tx.hash))
+    const promiseBlockchain = removeResident(wallet);
+    const promiseBackend = deletApiResident(wallet);
+
+    Promise.all([promiseBlockchain, promiseBackend])
+      .then((tx) => navigate("/residents?tx=" + tx[0].hash))
       .catch((err) => {
         if (err instanceof Error) setError(err.message);
       })

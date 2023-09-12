@@ -72,6 +72,10 @@ contract Condominium is ICondominium {
         require(!_isCounselor(resident), "A counselor cannot be removed");
         uint index = _residentIndex[resident];
 
+        if(index == 0) {
+            require(residents[index].wallet == resident, "This resident does not exists");
+        }
+
         if(index != residents.length - 1) {
             Lib.Resident memory latest = residents[residents.length - 1];
             residents[index] = latest;
