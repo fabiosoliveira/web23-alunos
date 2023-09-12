@@ -20,7 +20,7 @@ export async function doApiLogin(
   return response.data.token;
 }
 
-type ApiResident = {
+export type ApiResident = {
   wallet: string;
   name: string;
   profile: string;

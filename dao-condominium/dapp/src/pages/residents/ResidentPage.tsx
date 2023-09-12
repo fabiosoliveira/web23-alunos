@@ -3,6 +3,7 @@ import Footer from "../../components/Footer";
 import Sidebar from "../../components/Sidebar";
 import SwitchInput from "../../components/SwitchInput";
 import {
+  Profiler,
   Resident,
   addResident,
   doLogout,
@@ -13,6 +14,12 @@ import {
 } from "../../services/Web3Service";
 import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../../components/Loader";
+import {
+  ApiResident,
+  getApiResident,
+  addApiResident,
+  updateApiResident,
+} from "../../services/ApiService";
 
 const RESIDENT_INITIAL_STATE = {
   isCounselor: false,
@@ -25,13 +32,22 @@ const RESIDENT_INITIAL_STATE = {
 function ResidentPage() {
   const navigate = useNavigate();
   const { wallet } = useParams();
+
   const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(0);
   const [resident, setResident] = useState<Resident>(RESIDENT_INITIAL_STATE);
+  const [apiResident, setApiResident] = useState<ApiResident>(
+    {} as ApiResident
+  );
 
   function onResidentChange(event: ChangeEvent<HTMLInputElement>): void {
     const { id, value } = event.target;
     setResident((resident) => ({ ...resident, [id]: value }));
+  }
+
+  function onApiResidentChange(event: ChangeEvent<HTMLInputElement>): void {
+    const { id, value } = event.target;
+    setApiResident((resident) => ({ ...resident, [id]: value }));
   }
 
   function btnSaveClick() {
@@ -39,14 +55,34 @@ function ResidentPage() {
 
     setMessage("Connecting to wallet...wait...");
     if (!wallet) {
-      addResident(resident.wallet, resident.residence)
-        .then((tx) => navigate("/residents?tx=" + tx.hash))
+      const promiseBlockchain = addResident(
+        resident.wallet,
+        resident.residence
+      );
+      const promiseBackend = addApiResident({
+        ...apiResident,
+        profile: Profiler.RESIDENT,
+        wallet: resident.wallet,
+      });
+      Promise.all([promiseBlockchain, promiseBackend])
+        .then((results) => navigate("/residents?tx=" + results[0].hash))
         .catch((err) => {
           if (err instanceof Error) setMessage(err.message);
         });
     } else {
-      setCouncelor(resident.wallet, resident.isCounselor)
-        .then((tx) => navigate("/residents?tx=" + tx.hash))
+      const profile: Profiler = resident.isCounselor
+        ? Profiler.COUNSELOR
+        : Profiler.RESIDENT;
+      const promises = [];
+      if (apiResident.profile !== profile) {
+        promises.push(setCouncelor(resident.wallet, resident.isCounselor));
+      }
+
+      promises.push(
+        updateApiResident(wallet, { ...apiResident, profile, wallet })
+      );
+      Promise.all(promises)
+        .then((results) => navigate("/residents?tx=" + wallet))
         .catch((err) => {
           if (err instanceof Error) setMessage(err.message);
         });
@@ -73,7 +109,7 @@ function ResidentPage() {
     }
 
     if (wallet) {
-      setIsLoading(true);
+      setIsLoading(2);
       getResident(wallet)
         .then((resident) => {
           setResident(resident);
@@ -81,7 +117,16 @@ function ResidentPage() {
         .catch((err) => {
           if (err instanceof Error) setMessage(err.message);
         })
-        .finally(() => setIsLoading(false));
+        .finally(() => setIsLoading((state) => state - 1));
+
+      getApiResident(wallet)
+        .then((apiResident) => {
+          setApiResident(apiResident);
+        })
+        .catch((err) => {
+          if (err instanceof Error) setMessage(err.message);
+        })
+        .finally(() => setIsLoading((state) => state - 1));
     }
   }, [wallet]);
 
@@ -97,7 +142,7 @@ function ResidentPage() {
                   <div className="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
                     <h6 className="text-white text-capitalize ps-3">
                       <i className="material-icons opacity-10 me-2">group</i>
-                      New Resident
+                      {wallet ? "Edit " : "New "} Resident
                     </h6>
                   </div>
                 </div>
@@ -136,6 +181,56 @@ function ResidentPage() {
                             placeholder="1101"
                             disabled={!!wallet}
                             onChange={onResidentChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row ms-3">
+                    <div className="col-md-6 mb-3">
+                      <div className="form-group">
+                        <label htmlFor="name">Name:</label>
+                        <div className="input-group input-group-outline">
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="name"
+                            value={apiResident.name || ""}
+                            onChange={onApiResidentChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row ms-3">
+                    <div className="col-md-6 mb-3">
+                      <div className="form-group">
+                        <label htmlFor="phone">Phone:</label>
+                        <div className="input-group input-group-outline">
+                          <input
+                            type="tel"
+                            className="form-control"
+                            id="phone"
+                            value={apiResident.phone || ""}
+                            placeholder="+555123456789"
+                            onChange={onApiResidentChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row ms-3">
+                    <div className="col-md-6 mb-3">
+                      <div className="form-group">
+                        <label htmlFor="email">E-mail:</label>
+                        <div className="input-group input-group-outline">
+                          <input
+                            type="email"
+                            className="form-control"
+                            id="email"
+                            value={apiResident.email || ""}
+                            placeholder="name@company.com"
+                            onChange={onApiResidentChange}
                           />
                         </div>
                       </div>
