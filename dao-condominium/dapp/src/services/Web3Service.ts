@@ -182,3 +182,76 @@ export async function setCouncelor(wallet: string, isEntering: boolean) {
   const contract = getContractSigner();
   return contract.setCounselor(wallet, isEntering);
 }
+
+export enum Category {
+  DECISION,
+  SPENT,
+  CHANGE_QUOTA,
+  CHANGE_MANAGER,
+}
+
+export enum Status {
+  IDLE,
+  VOTING,
+  APPROVED,
+  DENIED,
+  DELETED,
+  SPENT,
+} // 0, 1, 2, 3
+
+export type Topic = {
+  title: string;
+  description: string;
+  category: Category;
+  amount: ethers.BigNumber;
+  responsible: string;
+  status?: Status;
+  createdDate?: number;
+  startDate?: number;
+  endDate?: number;
+};
+
+export type TopicPage = {
+  topics: Topic[];
+  total: ethers.BigNumber;
+};
+
+export async function getTopics(page = 1, pageSize = 10): Promise<TopicPage> {
+  const contract = getContract();
+
+  const result = await contract.getTopics(page, pageSize);
+  const topics = result.topics
+    .filter((t) => t.createdDate)
+    .map((t) => ({
+      ...t,
+      createdDate: t.createdDate.toNumber(),
+      startDate: t.startDate.toNumber(),
+      endDate: t.endDate.toNumber(),
+    }));
+
+  return {
+    topics,
+    total: ethers.BigNumber.from(result.total),
+  };
+}
+
+export async function getTopic(title: string): Promise<Topic> {
+  const contract = getContract();
+
+  const response = await contract.getTopic(title);
+
+  return {
+    ...response,
+    startDate: response.startDate.toNumber(),
+    endDate: response.endDate.toNumber(),
+    createdDate: response.createdDate.toNumber(),
+  };
+}
+
+export async function removeTopic(title: string) {
+  if (getProfile() !== Profiler.MANAGER)
+    throw new Error("You do not have permission.");
+
+  const contract = getContractSigner();
+  return contract.removeTopic(title);
+}
