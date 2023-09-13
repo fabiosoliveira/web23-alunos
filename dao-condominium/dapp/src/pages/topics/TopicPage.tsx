@@ -3,7 +3,9 @@ import Footer from "../../components/Footer";
 import Sidebar from "../../components/Sidebar";
 import SwitchInput from "../../components/SwitchInput";
 import {
+  Category,
   Profiler,
+  Status,
   Topic,
   doLogout,
   getTopic,
@@ -12,6 +14,8 @@ import {
 } from "../../services/Web3Service";
 import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../../components/Loader";
+import If from "../../components/If";
+import TopicCategory from "../../components/TopicCategory";
 
 function TopicPage() {
   const navigate = useNavigate();
@@ -21,7 +25,7 @@ function TopicPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [topic, setTopic] = useState<Topic>({} as Topic);
 
-  function onResidentChange(event: ChangeEvent<HTMLInputElement>): void {
+  function onTopicChange(event: ChangeEvent<HTMLInputElement>): void {
     const { id, value } = event.target;
     setTopic((resident) => ({ ...resident, [id]: value }));
   }
@@ -65,11 +69,11 @@ function TopicPage() {
     // }
   }
 
-  //   function getNextPayment() {
-  //     const dateMs = (resident.nextPayment as number) * 1000; // convert to milliseconds
-  //     if (!dateMs) return "Never Payed";
-  //     return new Date(dateMs).toDateString();
-  //   }
+  function getDate(timestamp: number) {
+    const dateMs = timestamp * 1000; // convert to milliseconds
+    if (!dateMs) return "";
+    return new Date(dateMs).toDateString();
+  }
 
   //   function getNextPaymentClass() {
   //     const className = "input-group input-group-outline ";
@@ -77,6 +81,40 @@ function TopicPage() {
   //     if (!dateMs || dateMs < Date.now()) return className + "is-invalid";
   //     return className + "is-valid";
   //   }
+
+  function getStatus() {
+    switch (topic.status) {
+      case Status.APPROVED:
+        return "APPROVED";
+      case Status.DENIED:
+        return "DENIED";
+      case Status.DELETED:
+        return "DELETED";
+      case Status.SPENT:
+        return "SPENT";
+      case Status.VOTING:
+        return "VOTING";
+      default:
+        return "IDLE";
+    }
+  }
+
+  function showResponsible() {
+    return [Category.SPENT, Category.CHANGE_MANAGER].includes(topic.category);
+  }
+
+  function showAmount() {
+    return [Category.SPENT, Category.CHANGE_QUOTA].includes(topic.category);
+  }
+
+  function isClosed() {
+    return [
+      Status.APPROVED,
+      Status.DENIED,
+      Status.DELETED,
+      Status.SPENT,
+    ].includes(topic.status || 0);
+  }
 
   useEffect(() => {
     if (title) {
@@ -111,19 +149,19 @@ function TopicPage() {
                 </div>
                 <div className="card-body px-0 pb-2">
                   {isLoading ? <Loader /> : <></>}
-                  {/* <div className="row ms-3">
+                  <div className="row ms-3">
                     <div className="col-md-6 mb-3">
                       <div className="form-group">
-                        <label htmlFor="wallet">Wallet Address:</label>
+                        <label htmlFor="title">Title:</label>
                         <div className="input-group input-group-outline">
                           <input
                             type="text"
                             className="form-control"
-                            id="wallet"
-                            value={resident.wallet}
-                            placeholder="0x00..."
-                            disabled={!!wallet}
-                            onChange={onResidentChange}
+                            id="title"
+                            value={topic.title || ""}
+                            placeholder="Would be great..."
+                            disabled={!!title}
+                            onChange={onTopicChange}
                           />
                         </div>
                       </div>
@@ -132,109 +170,147 @@ function TopicPage() {
                   <div className="row ms-3">
                     <div className="col-md-6 mb-3">
                       <div className="form-group">
-                        <label htmlFor="residence">
-                          Residence Id: (block+apartment)
-                        </label>
-                        <div className="input-group input-group-outline">
-                          <input
-                            type="number"
-                            className="form-control"
-                            id="residence"
-                            value={resident.residence}
-                            placeholder="1101"
-                            disabled={!!wallet}
-                            onChange={onResidentChange}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row ms-3">
-                    <div className="col-md-6 mb-3">
-                      <div className="form-group">
-                        <label htmlFor="name">Name:</label>
+                        <label htmlFor="description">Description:</label>
                         <div className="input-group input-group-outline">
                           <input
                             type="text"
                             className="form-control"
-                            id="name"
-                            value={apiResident.name || ""}
-                            onChange={onApiResidentChange}
+                            id="description"
+                            value={topic.description}
+                            placeholder="..."
+                            disabled={!!title && topic.status !== Status.IDLE}
+                            onChange={onTopicChange}
                           />
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="row ms-3">
-                    <div className="col-md-6 mb-3">
-                      <div className="form-group">
-                        <label htmlFor="phone">Phone:</label>
-                        <div className="input-group input-group-outline">
-                          <input
-                            type="tel"
-                            className="form-control"
-                            id="phone"
-                            value={apiResident.phone || ""}
-                            placeholder="+555123456789"
-                            onChange={onApiResidentChange}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row ms-3">
-                    <div className="col-md-6 mb-3">
-                      <div className="form-group">
-                        <label htmlFor="email">E-mail:</label>
-                        <div className="input-group input-group-outline">
-                          <input
-                            type="email"
-                            className="form-control"
-                            id="email"
-                            value={apiResident.email || ""}
-                            placeholder="name@company.com"
-                            onChange={onApiResidentChange}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {wallet ? (
+                  <If condition={title}>
                     <div className="row ms-3">
                       <div className="col-md-6 mb-3">
                         <div className="form-group">
-                          <label htmlFor="nextPayment">Next Payment:</label>
-                          <div className={getNextPaymentClass()}>
+                          <label htmlFor="status">Status:</label>
+                          <div className="input-group input-group-outline">
                             <input
                               type="text"
                               className="form-control"
-                              id="nextPayment"
-                              value={getNextPayment()}
+                              id="status"
+                              value={getStatus()}
                               disabled={true}
                             />
                           </div>
                         </div>
                       </div>
                     </div>
-                  ) : (
-                    <></>
-                  )}
-                  {isManager() && wallet ? (
-                    <div className="row ms-3">
-                      <div className="col-md-6 mb-3">
-                        <div className="form-group">
-                          <SwitchInput
-                            id="isCounselor"
-                            isChecked={resident.isCounselor}
-                            text="Is Counselor?"
-                            onChange={onResidentChange}
+                  </If>
+                  <div className="row ms-3">
+                    <div className="col-md-6 mb-3">
+                      <div className="form-group">
+                        <label htmlFor="category">Category:</label>
+                        <div className="input-group input-group-outline">
+                          <TopicCategory
+                            value={topic.category}
+                            onChange={onTopicChange}
+                            disabled={!!title}
                           />
                         </div>
                       </div>
                     </div>
-                  ) : (
-                    <></>
-                  )} */}
+                  </div>
+                  <If condition={showResponsible()}>
+                    <div className="row ms-3">
+                      <div className="col-md-6 mb-3">
+                        <div className="form-group">
+                          <label htmlFor="responsible">Responsible:</label>
+                          <div className="input-group input-group-outline">
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="responsible"
+                              value={topic.responsible || ""}
+                              placeholder="0x000..."
+                              onChange={onTopicChange}
+                              disabled={!!title && topic.status !== Status.IDLE}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </If>
+                  <If condition={showAmount()}>
+                    <div className="row ms-3">
+                      <div className="col-md-6 mb-3">
+                        <div className="form-group">
+                          <label htmlFor="amount">Amount (wei):</label>
+                          <div className="input-group input-group-outline">
+                            <input
+                              type="number"
+                              className="form-control"
+                              id="amount"
+                              value={topic.amount?.toString() || ""}
+                              placeholder="0"
+                              onChange={onTopicChange}
+                              disabled={!!title && topic.status !== Status.IDLE}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </If>
+                  <If condition={title}>
+                    <div className="row ms-3">
+                      <div className="col-md-6 mb-3">
+                        <div className="form-group">
+                          <label htmlFor="createdDate">Created Date:</label>
+                          <div className="input-group input-group-outline">
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="createdDate"
+                              value={getDate(topic.createdDate || 0)}
+                              disabled={true}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </If>
+                  <If condition={isClosed() || topic.status === Status.VOTING}>
+                    <div className="row ms-3">
+                      <div className="col-md-6 mb-3">
+                        <div className="form-group">
+                          <label htmlFor="startDate">Start Date:</label>
+                          <div className="input-group input-group-outline">
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="startDate"
+                              value={getDate(topic.startDate || 0)}
+                              disabled={true}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </If>
+                  <If condition={isClosed()}>
+                    <div className="row ms-3">
+                      <div className="col-md-6 mb-3">
+                        <div className="form-group">
+                          <label htmlFor="endDate">End Date:</label>
+                          <div className="input-group input-group-outline">
+                            <input
+                              type="text"
+                              className="form-control"
+                              id="endDate"
+                              value={getDate(topic.endDate || 0)}
+                              disabled={true}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </If>
 
                   <div className="row ms-3">
                     <div className="col-md-12 mb-3">
