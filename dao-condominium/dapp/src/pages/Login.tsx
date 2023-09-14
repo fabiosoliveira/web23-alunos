@@ -8,6 +8,7 @@ function Login() {
   const [message, setMessage] = useState("");
 
   function btnLoginClick() {
+    setMessage("Logging in...");
     doLogin()
       .then(() => navigate("/topics"))
       .catch((error) => {

@@ -51,7 +51,7 @@ function Topics() {
     setMessage("");
     setError("");
     removeTopic(title)
-      .then((tx) => navigate("/residents?tx=" + tx.hash))
+      .then((tx) => navigate("/topics?tx=" + tx.hash))
       .catch((err) => {
         if (err instanceof Error) setError(err.message);
       })

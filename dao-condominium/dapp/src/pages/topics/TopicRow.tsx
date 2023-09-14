@@ -92,7 +92,7 @@ function TopicRow({ data, onDelete }: Props) {
         >
           <i className="material-icons text-sm">visibility</i>
         </a>
-        <If condition={isManager()}>
+        <If condition={isManager() && data.status === Status.IDLE}>
           <a
             href="#"
             className="btn btn-sm btn-danger me-1"

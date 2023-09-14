@@ -1,16 +1,14 @@
 import { ChangeEvent, useState, useEffect } from "react";
 import Footer from "../../components/Footer";
 import Sidebar from "../../components/Sidebar";
-import SwitchInput from "../../components/SwitchInput";
 import {
   Category,
-  Profiler,
   Status,
   Topic,
   editTopic,
   getTopic,
   addTopic,
-  isResident,
+  isManager,
 } from "../../services/Web3Service";
 import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../../components/Loader";
@@ -55,13 +53,6 @@ function TopicPage() {
     return new Date(dateMs).toDateString();
   }
 
-  //   function getNextPaymentClass() {
-  //     const className = "input-group input-group-outline ";
-  //     const dateMs = (resident.nextPayment as number) * 1000;
-  //     if (!dateMs || dateMs < Date.now()) return className + "is-invalid";
-  //     return className + "is-valid";
-  //   }
-
   function getStatus() {
     switch (topic.status) {
       case Status.APPROVED:
@@ -80,23 +71,27 @@ function TopicPage() {
   }
 
   function showResponsible() {
-    topic.category = parseInt(`${topic.category}`);
-    return [Category.SPENT, Category.CHANGE_MANAGER].includes(topic.category);
+    const category = parseInt(`${topic.category}`);
+    return [Category.SPENT, Category.CHANGE_MANAGER].includes(category);
   }
 
   function showAmount() {
-    topic.category = parseInt(`${topic.category}`);
-    return [Category.SPENT, Category.CHANGE_QUOTA].includes(topic.category);
+    const category = parseInt(`${topic.category}`);
+    return [Category.SPENT, Category.CHANGE_QUOTA].includes(category);
   }
 
   function isClosed() {
-    topic.status = parseInt(`${topic.status || 0}`);
+    const status = parseInt(`${topic.status || 0}`);
     return [
       Status.APPROVED,
       Status.DENIED,
       Status.DELETED,
       Status.SPENT,
-    ].includes(topic.status);
+    ].includes(status);
+  }
+
+  function isDisabled() {
+    return !!title && (topic.status !== Status.IDLE || !isManager());
   }
 
   useEffect(() => {
@@ -163,7 +158,7 @@ function TopicPage() {
                             id="description"
                             value={topic.description}
                             placeholder="..."
-                            disabled={!!title && topic.status !== Status.IDLE}
+                            disabled={isDisabled()}
                             onChange={onTopicChange}
                           />
                         </div>
@@ -215,7 +210,7 @@ function TopicPage() {
                               value={topic.responsible || ""}
                               placeholder="0x000..."
                               onChange={onTopicChange}
-                              disabled={!!title && topic.status !== Status.IDLE}
+                              disabled={isDisabled()}
                             />
                           </div>
                         </div>
@@ -235,7 +230,7 @@ function TopicPage() {
                               value={topic.amount?.toString() || "0"}
                               placeholder="0"
                               onChange={onTopicChange}
-                              disabled={!!title && topic.status !== Status.IDLE}
+                              disabled={isDisabled()}
                             />
                           </div>
                         </div>
@@ -297,18 +292,24 @@ function TopicPage() {
                     </div>
                   </If>
 
-                  <div className="row ms-3">
-                    <div className="col-md-12 mb-3">
-                      <button
-                        className="btn bg-gradient-dark me-2"
-                        onClick={btnSaveClick}
-                      >
-                        <i className="material-icons opacity-10 me-2">save</i>
-                        Save Topic
-                      </button>
-                      <span className="text-danger">{message}</span>
+                  <If
+                    condition={
+                      !title || (isManager() && topic.status === Status.IDLE)
+                    }
+                  >
+                    <div className="row ms-3">
+                      <div className="col-md-12 mb-3">
+                        <button
+                          className="btn bg-gradient-dark me-2"
+                          onClick={btnSaveClick}
+                        >
+                          <i className="material-icons opacity-10 me-2">save</i>
+                          Save Topic
+                        </button>
+                        <span className="text-danger">{message}</span>
+                      </div>
                     </div>
-                  </div>
+                  </If>
                 </div>
               </div>
             </div>
