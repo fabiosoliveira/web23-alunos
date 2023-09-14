@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import fs from "node:fs";
 import path from "node:path";
-import { keccak256 } from "ethers";
+import { keccak256, toUtf8Bytes } from "ethers";
 
 function checkTitleOrHash(hashOrTitle: string) {
   if (!hashOrTitle) throw new Error("The hash or title is required.");
 
   const regex = /^[0-9a-f]{64}$/gi;
   if (!regex.test(hashOrTitle)) {
-    return keccak256(hashOrTitle);
+    return keccak256(toUtf8Bytes(hashOrTitle));
   }
 
   return hashOrTitle;
@@ -38,6 +38,7 @@ async function getTopicFiles(req: Request, res: Response) {
 async function addTopicFile(req: Request, res: Response, next: NextFunction) {
   const hash = checkTitleOrHash(req.params.hash);
   const file = req.file;
+
   if (!file) return next(new Error("No file found."));
 
   const folder = path.resolve(__dirname, "..", "..", "files");

@@ -3,6 +3,7 @@ import If from "../../components/If";
 import Loader from "../../components/Loader";
 import { Status } from "../../services/Web3Service";
 import TopicFileRow from "./TopicFileRow";
+import { uploadTopicFile } from "../../services/ApiService";
 
 type Props = {
   title: string;
@@ -11,15 +12,45 @@ type Props = {
 
 function TopicFiles({ title, status }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-  const [files, setFiles] = useState([
-    "myImage.jpg",
-    "myZip.rar",
-    "myVideo.mp4",
-  ]);
+  const [files, setFiles] = useState([]);
+  const [newFile, setNewFile] = useState<File>();
+  const [uploadMessage, setUploadMessage] = useState("");
 
   function onDeleteTopic(fileName: string) {
     alert(fileName);
   }
+
+  function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (!event.target.files) return;
+    setNewFile(event.target.files[0]);
+  }
+
+  function loadFiles() {
+    console.log("l");
+  }
+
+  function btnUploadClick(): void {
+    if (!newFile) return;
+    setIsLoading(true);
+    setUploadMessage("Uploading file...wait...");
+    uploadTopicFile(title, newFile)
+      .then(() => {
+        setNewFile(undefined);
+        setUploadMessage("");
+        // loadFiles();
+      })
+      .catch((err) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        setUploadMessage(err.response ? err.response.data : err.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
+
+  //   useEffect(() => {
+  //     loadFiles();
+  //   }, []);
 
   return (
     <div className="row">
@@ -59,17 +90,46 @@ function TopicFiles({ title, status }: Props) {
                       />
                     ))}
                   </If>
+                  <If condition={!files?.length}>
+                    <tr>
+                      <td colSpan={2}>
+                        <p className="ms-3">
+                          There are no files for this topic. Upload one first.
+                        </p>
+                      </td>
+                    </tr>
+                  </If>
                 </tbody>
               </table>
+              <hr />
             </div>
-            <div className="row ms-2">
-              <div className="col-md-12 mb-3">
-                <a className="btn bg-gradient-dark me-2" href="/topics/new">
-                  <i className="material-icons opacity-10 me-2">add</i>
-                  Add New Topic
-                </a>
+            <If condition={status === Status.IDLE}>
+              <div className="row mb-3 ms-3">
+                <div className="col-md-6 mb-3">
+                  <div className="form-group">
+                    <h6>Upload a new file:</h6>
+                    <div className="input-group input-group-outline">
+                      <input
+                        type="file"
+                        className="form-control"
+                        id="newFile"
+                        onChange={onFileChange}
+                      />
+                      <button
+                        className="btn bg-gradient-dark mb-0"
+                        onClick={btnUploadClick}
+                      >
+                        <i className="material-icons opacity-10 me-2">
+                          cloud_upload
+                        </i>
+                        Upload
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6 mt-5 text-danger">{uploadMessage}</div>
               </div>
-            </div>
+            </If>
           </div>
         </div>
       </div>

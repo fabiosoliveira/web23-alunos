@@ -8,8 +8,7 @@ import {
   addResident,
   doLogout,
   getResident,
-  isManager,
-  isResident,
+  hasManagerPermissions,
   setCouncelor,
 } from "../../services/Web3Service";
 import { useNavigate, useParams } from "react-router-dom";
@@ -103,7 +102,7 @@ function ResidentPage() {
   }
 
   useEffect(() => {
-    if (isResident()) {
+    if (hasManagerPermissions()) {
       doLogout();
       navigate("/");
     }
@@ -252,7 +251,7 @@ function ResidentPage() {
                   ) : (
                     <></>
                   )}
-                  {isManager() && wallet ? (
+                  {hasManagerPermissions() && wallet ? (
                     <div className="row ms-3">
                       <div className="col-md-6 mb-3">
                         <div className="form-group">

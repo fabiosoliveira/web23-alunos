@@ -1,4 +1,6 @@
+import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 import axios from "./AxiosConfig";
+import { hasManagerPermissions, hasCounselorPermissions } from "./Web3Service";
 
 const API_URL = import.meta.env.VITE_APP_API_URL as string;
 
@@ -37,6 +39,9 @@ export async function getApiResident(wallet: string) {
 }
 
 export async function addApiResident(resident: ApiResident) {
+  if (!hasCounselorPermissions())
+    throw new Error("You do not have permission.");
+
   const response = await axios.post<ApiResident>(
     `${API_URL}/residents/`,
     resident
@@ -46,6 +51,7 @@ export async function addApiResident(resident: ApiResident) {
 }
 
 export async function updateApiResident(wallet: string, resident: ApiResident) {
+  if (!hasManagerPermissions()) throw new Error("You do not have permission.");
   const response = await axios.patch<ApiResident>(
     `${API_URL}/residents/${wallet}`,
     resident
@@ -55,5 +61,21 @@ export async function updateApiResident(wallet: string, resident: ApiResident) {
 }
 
 export async function deletApiResident(wallet: string) {
+  if (!hasManagerPermissions()) throw new Error("You do not have permission.");
   await axios.delete<ApiResident>(`${API_URL}/residents/${wallet}`);
+}
+
+export async function uploadTopicFile(topicTitle: string, file: File) {
+  if (!hasCounselorPermissions())
+    throw new Error("You do not have permission.");
+
+  const hash = keccak256(toUtf8Bytes(topicTitle));
+  const formData = new FormData();
+  formData.append("file", file);
+
+  await axios.post(`${API_URL}/topicfiles/${hash}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 }

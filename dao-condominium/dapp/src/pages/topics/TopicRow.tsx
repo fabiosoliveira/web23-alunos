@@ -1,4 +1,9 @@
-import { Category, Status, Topic, isManager } from "../../services/Web3Service";
+import {
+  Category,
+  Status,
+  Topic,
+  hasManagerPermissions,
+} from "../../services/Web3Service";
 import If from "../../components/If";
 
 type Props = {
@@ -98,7 +103,7 @@ function TopicRow({ data, onDelete }: Props) {
         >
           <i className="material-icons text-sm">visibility</i>
         </a>
-        <If condition={isManager() && data.status === Status.IDLE}>
+        <If condition={hasManagerPermissions() && data.status === Status.IDLE}>
           <a
             href="#"
             className="btn btn-sm btn-danger me-1"

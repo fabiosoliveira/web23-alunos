@@ -151,11 +151,15 @@ export async function upgrade(address: string) {
   return contract.upgrade(address);
 }
 
-export function isManager() {
+export function hasManagerPermissions() {
   return getProfile() === Profiler.MANAGER;
 }
 
-export function isResident() {
+export function hasCounselorPermissions() {
+  return getProfile() !== Profiler.RESIDENT;
+}
+
+export function hasResidentPermissions() {
   return getProfile() === Profiler.RESIDENT;
 }
 

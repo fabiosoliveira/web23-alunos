@@ -8,7 +8,7 @@ import {
   editTopic,
   getTopic,
   addTopic,
-  isManager,
+  hasManagerPermissions,
 } from "../../services/Web3Service";
 import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../../components/Loader";
@@ -92,7 +92,9 @@ function TopicPage() {
   }
 
   function isDisabled() {
-    return !!title && (topic.status !== Status.IDLE || !isManager());
+    return (
+      !!title && (topic.status !== Status.IDLE || !hasManagerPermissions())
+    );
   }
 
   useEffect(() => {
@@ -295,7 +297,8 @@ function TopicPage() {
 
                   <If
                     condition={
-                      !title || (isManager() && topic.status === Status.IDLE)
+                      !title ||
+                      (hasManagerPermissions() && topic.status === Status.IDLE)
                     }
                   >
                     <div className="row ms-3">

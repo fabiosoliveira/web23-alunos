@@ -1,4 +1,4 @@
-import { Status, isManager } from "../../services/Web3Service";
+import { Status, hasManagerPermissions } from "../../services/Web3Service";
 import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 
 import If from "../../components/If";
@@ -51,7 +51,7 @@ function TopicFileRow({ fileName, status, topicTitle, onDelete }: Props) {
           <i className="material-icons text-sm">cloud_download</i>
         </a>
 
-        <If condition={isManager() && status === Status.IDLE}>
+        <If condition={hasManagerPermissions() && status === Status.IDLE}>
           <a
             href="#"
             className="btn btn-sm btn-danger me-1 mb-0"
