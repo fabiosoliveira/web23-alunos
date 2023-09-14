@@ -14,6 +14,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../../components/Loader";
 import If from "../../components/If";
 import TopicCategory from "../../components/TopicCategory";
+import TopicFiles from "./TopicFiles";
 
 function TopicPage() {
   const navigate = useNavigate();
@@ -314,7 +315,9 @@ function TopicPage() {
               </div>
             </div>
           </div>
-
+          <If condition={title}>
+            <TopicFiles title={title!} status={topic.status} />
+          </If>
           <Footer />
         </div>
       </main>

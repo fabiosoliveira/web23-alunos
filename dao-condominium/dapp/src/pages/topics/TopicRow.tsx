@@ -6,6 +6,12 @@ type Props = {
   onDelete: (wallet: string) => void;
 };
 
+/**
+ * Renders a table row for a topic.
+ *
+ * @param {Props} { data, onDelete } - An object containing the topic data and a callback function for deleting the topic.
+ * @return {JSX.Element} - The rendered table row.
+ */
 function TopicRow({ data, onDelete }: Props) {
   function getDate() {
     if (!data.createdDate) return "";
