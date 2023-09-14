@@ -9,6 +9,7 @@ import If from "../../components/If";
 import Loader from "../../components/Loader";
 import Pagination from "../../components/Pagination";
 import { ethers } from "ethers";
+import TopicRow from "./TopicRow";
 
 function Topics() {
   const navigate = useNavigate();
@@ -116,15 +117,15 @@ function Topics() {
                         </tr>
                       </thead>
                       <tbody>
-                        {/* <If condition={residents.length}>
-                          {residents.map((resident) => (
-                            <ResidentRow
-                              key={resident.wallet}
-                              data={resident}
-                              onDelete={() => onDeleteResident(resident.wallet)}
+                        <If condition={topics.length}>
+                          {topics.map((topic) => (
+                            <TopicRow
+                              key={topic.title}
+                              data={topic}
+                              onDelete={() => onDeleteTopic(topic.title)}
                             />
                           ))}
-                        </If> */}
+                        </If>
                       </tbody>
                     </table>
                     <Pagination count={count} pageSize={10} />

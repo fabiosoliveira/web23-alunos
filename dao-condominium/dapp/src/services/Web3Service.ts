@@ -221,7 +221,7 @@ export async function getTopics(page = 1, pageSize = 10): Promise<TopicPage> {
 
   const result = await contract.getTopics(page, pageSize);
   const topics = result.topics
-    .filter((t) => t.createdDate)
+    .filter((t) => t.title)
     .map((t) => ({
       ...t,
       createdDate: t.createdDate.toNumber(),
@@ -254,4 +254,30 @@ export async function removeTopic(title: string) {
 
   const contract = getContractSigner();
   return contract.removeTopic(title);
+}
+
+export async function addTopic(topic: Topic) {
+  const contract = getContractSigner();
+  topic.amount = ethers.BigNumber.from(topic.amount || 0);
+  return contract.addTopic(
+    topic.title,
+    topic.description,
+    topic.category,
+    topic.amount,
+    topic.responsible
+  );
+}
+
+export async function editTopic(
+  topicToEdit: string,
+  description: string,
+  amount: ethers.BigNumber,
+  responsible: string
+) {
+  if (getProfile() !== Profiler.MANAGER)
+    throw new Error("You do not have permission.");
+
+  const contract = getContractSigner();
+  amount = ethers.BigNumber.from(amount || 0);
+  return contract.editTopic(topicToEdit, description, amount, responsible);
 }

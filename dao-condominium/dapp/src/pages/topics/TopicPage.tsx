@@ -7,9 +7,9 @@ import {
   Profiler,
   Status,
   Topic,
-  doLogout,
+  editTopic,
   getTopic,
-  isManager,
+  addTopic,
   isResident,
 } from "../../services/Web3Service";
 import { useNavigate, useParams } from "react-router-dom";
@@ -34,39 +34,19 @@ function TopicPage() {
     if (!topic) return;
 
     setMessage("Connecting to wallet...wait...");
-    // if (!title) {
-    //   const promiseBlockchain = addResident(
-    //     resident.wallet,
-    //     resident.residence
-    //   );
-    //   const promiseBackend = addApiResident({
-    //     ...apiResident,
-    //     profile: Profiler.RESIDENT,
-    //     wallet: resident.wallet,
-    //   });
-    //   Promise.all([promiseBlockchain, promiseBackend])
-    //     .then((results) => navigate("/residents?tx=" + results[0].hash))
-    //     .catch((err) => {
-    //       if (err instanceof Error) setMessage(err.message);
-    //     });
-    // } else {
-    //   const profile: Profiler = resident.isCounselor
-    //     ? Profiler.COUNSELOR
-    //     : Profiler.RESIDENT;
-    //   const promises = [];
-    //   if (apiResident.profile !== profile) {
-    //     promises.push(setCouncelor(resident.wallet, resident.isCounselor));
-    //   }
-
-    //   promises.push(
-    //     updateApiResident(wallet, { ...apiResident, profile, wallet })
-    //   );
-    //   Promise.all(promises)
-    //     .then((results) => navigate("/residents?tx=" + wallet))
-    //     .catch((err) => {
-    //       if (err instanceof Error) setMessage(err.message);
-    //     });
-    // }
+    if (!title) {
+      addTopic(topic)
+        .then((results) => navigate("/topics?tx=" + results.hash))
+        .catch((err) => {
+          if (err instanceof Error) setMessage(err.message);
+        });
+    } else {
+      editTopic(title, topic.description, topic.amount, topic.responsible)
+        .then((tx) => navigate("/topics?tx=" + tx.hash))
+        .catch((err) => {
+          if (err instanceof Error) setMessage(err.message);
+        });
+    }
   }
 
   function getDate(timestamp: number) {
@@ -100,20 +80,23 @@ function TopicPage() {
   }
 
   function showResponsible() {
+    topic.category = parseInt(`${topic.category}`);
     return [Category.SPENT, Category.CHANGE_MANAGER].includes(topic.category);
   }
 
   function showAmount() {
+    topic.category = parseInt(`${topic.category}`);
     return [Category.SPENT, Category.CHANGE_QUOTA].includes(topic.category);
   }
 
   function isClosed() {
+    topic.status = parseInt(`${topic.status || 0}`);
     return [
       Status.APPROVED,
       Status.DENIED,
       Status.DELETED,
       Status.SPENT,
-    ].includes(topic.status || 0);
+    ].includes(topic.status);
   }
 
   useEffect(() => {
@@ -126,6 +109,8 @@ function TopicPage() {
           if (err instanceof Error) setMessage(err.message);
         })
         .finally(() => setIsLoading(false));
+    } else {
+      topic.responsible = localStorage.getItem("account") || "";
     }
   }, [title]);
 
@@ -247,7 +232,7 @@ function TopicPage() {
                               type="number"
                               className="form-control"
                               id="amount"
-                              value={topic.amount?.toString() || ""}
+                              value={topic.amount?.toString() || "0"}
                               placeholder="0"
                               onChange={onTopicChange}
                               disabled={!!title && topic.status !== Status.IDLE}
