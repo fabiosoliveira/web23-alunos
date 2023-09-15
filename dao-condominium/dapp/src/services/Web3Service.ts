@@ -303,3 +303,18 @@ export async function closeVoting(topic: string) {
 
   return contract.closeVoting(topic);
 }
+
+export async function payQuota(residenceId: number, value: ethers.BigNumber) {
+  if (getProfile() !== Profiler.RESIDENT)
+    throw new Error("You do not have permission.");
+
+  const contract = getContractSigner();
+
+  return contract.payQuota(residenceId, { value });
+}
+
+export async function getQuota(): Promise<ethers.BigNumber> {
+  const contract = getContract();
+
+  return contract.getQuota();
+}

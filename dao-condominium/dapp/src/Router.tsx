@@ -7,6 +7,7 @@ import { Profiler, doLogout } from "./services/Web3Service";
 import Settings from "./pages/Settings";
 import Residents from "./pages/residents";
 import ResidentPage from "./pages/residents/ResidentPage";
+import Quota from "./pages/Quota";
 
 function Router() {
   return (
@@ -75,6 +76,14 @@ function Router() {
             <CouncilRoute>
               <Residents />
             </CouncilRoute>
+          }
+        />
+        <Route
+          path="/quota"
+          element={
+            <ResidentRoute>
+              <Quota />
+            </ResidentRoute>
           }
         />
       </Routes>
