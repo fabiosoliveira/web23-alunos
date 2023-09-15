@@ -9,6 +9,8 @@ import {
   getTopic,
   addTopic,
   hasManagerPermissions,
+  openVoting,
+  closeVoting,
 } from "../../services/Web3Service";
 import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../../components/Loader";
@@ -111,6 +113,27 @@ function TopicPage() {
       topic.responsible = localStorage.getItem("account") || "";
     }
   }, [title]);
+
+  function btnOpenVotingClick(): void {
+    if (topic && title) {
+      setMessage("Connecting to wallet...wait...");
+      openVoting(title)
+        .then((tx) => navigate("/topics?tx=" + tx.hash))
+        .catch((err) => {
+          if (err instanceof Error) setMessage(err.message);
+        });
+    }
+  }
+  function btnCloseVotingClick(): void {
+    if (topic && title) {
+      setMessage("Connecting to wallet...wait...");
+      closeVoting(title)
+        .then((tx) => navigate("/topics?tx=" + tx.hash))
+        .catch((err) => {
+          if (err instanceof Error) setMessage(err.message);
+        });
+    }
+  }
 
   return (
     <>
@@ -295,14 +318,15 @@ function TopicPage() {
                     </div>
                   </If>
 
-                  <If
-                    condition={
-                      !title ||
-                      (hasManagerPermissions() && topic.status === Status.IDLE)
-                    }
-                  >
-                    <div className="row ms-3">
-                      <div className="col-md-12 mb-3">
+                  <div className="row ms-3">
+                    <div className="col-md-12 mb-3">
+                      <If
+                        condition={
+                          !title ||
+                          (hasManagerPermissions() &&
+                            topic.status === Status.IDLE)
+                        }
+                      >
                         <button
                           className="btn bg-gradient-dark me-2"
                           onClick={btnSaveClick}
@@ -310,10 +334,40 @@ function TopicPage() {
                           <i className="material-icons opacity-10 me-2">save</i>
                           Save Topic
                         </button>
-                        <span className="text-danger">{message}</span>
-                      </div>
+                      </If>
+                      <If
+                        condition={
+                          hasManagerPermissions() &&
+                          topic.status === Status.IDLE
+                        }
+                      >
+                        <button
+                          className="btn btn-success me-2"
+                          onClick={btnOpenVotingClick}
+                        >
+                          <i className="material-icons opacity-10 me-2">
+                            lock_open
+                          </i>
+                          Open Voting
+                        </button>
+                      </If>
+                      <If
+                        condition={
+                          hasManagerPermissions() &&
+                          topic.status === Status.VOTING
+                        }
+                      >
+                        <button
+                          className="btn btn-danger me-2"
+                          onClick={btnCloseVotingClick}
+                        >
+                          <i className="material-icons opacity-10 me-2">lock</i>
+                          Close Voting
+                        </button>
+                      </If>
+                      <span className="text-danger">{message}</span>
                     </div>
-                  </If>
+                  </div>
                 </div>
               </div>
             </div>

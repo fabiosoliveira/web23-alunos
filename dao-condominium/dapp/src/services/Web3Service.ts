@@ -285,3 +285,21 @@ export async function editTopic(
   amount = ethers.BigNumber.from(amount || 0);
   return contract.editTopic(topicToEdit, description, amount, responsible);
 }
+
+export async function openVoting(topic: string) {
+  if (getProfile() !== Profiler.MANAGER)
+    throw new Error("You do not have permission.");
+
+  const contract = getContractSigner();
+
+  return contract.openVoting(topic);
+}
+
+export async function closeVoting(topic: string) {
+  if (getProfile() !== Profiler.MANAGER)
+    throw new Error("You do not have permission.");
+
+  const contract = getContractSigner();
+
+  return contract.closeVoting(topic);
+}
