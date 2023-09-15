@@ -3,7 +3,11 @@ import If from "../../components/If";
 import Loader from "../../components/Loader";
 import { Status } from "../../services/Web3Service";
 import TopicFileRow from "./TopicFileRow";
-import { uploadTopicFile } from "../../services/ApiService";
+import {
+  uploadTopicFile,
+  getTopicFiles,
+  deleteTopicFile,
+} from "../../services/ApiService";
 
 type Props = {
   title: string;
@@ -12,32 +16,20 @@ type Props = {
 
 function TopicFiles({ title, status }: Props) {
   const [isLoading, setIsLoading] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<string[]>([]);
   const [newFile, setNewFile] = useState<File>();
   const [uploadMessage, setUploadMessage] = useState("");
 
   function onDeleteTopic(fileName: string) {
-    alert(fileName);
-  }
+    if (status !== Status.IDLE)
+      return setUploadMessage("You cannot delete this file.");
 
-  function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    if (!event.target.files) return;
-    setNewFile(event.target.files[0]);
-  }
-
-  function loadFiles() {
-    console.log("l");
-  }
-
-  function btnUploadClick(): void {
-    if (!newFile) return;
     setIsLoading(true);
-    setUploadMessage("Uploading file...wait...");
-    uploadTopicFile(title, newFile)
+    setUploadMessage("Deleting file...wait...");
+    deleteTopicFile(title, fileName)
       .then(() => {
-        setNewFile(undefined);
         setUploadMessage("");
-        // loadFiles();
+        loadFiles();
       })
       .catch((err) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
@@ -48,9 +40,47 @@ function TopicFiles({ title, status }: Props) {
       });
   }
 
-  //   useEffect(() => {
-  //     loadFiles();
-  //   }, []);
+  function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (!event.target.files) return;
+    setNewFile(event.target.files[0]);
+  }
+
+  function loadFiles() {
+    setIsLoading(true);
+    getTopicFiles(title)
+      .then((files) => setFiles(files))
+      .catch((err) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        setUploadMessage(err.response ? err.response.data : err.message);
+        setFiles([]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
+
+  function btnUploadClick(): void {
+    if (!newFile) return;
+    setIsLoading(true);
+    setUploadMessage("Uploading file...wait...");
+    uploadTopicFile(title, newFile)
+      .then(() => {
+        setNewFile(undefined);
+        setUploadMessage("");
+        loadFiles();
+      })
+      .catch((err) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+        setUploadMessage(err.response ? err.response.data : err.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
+
+  useEffect(() => {
+    loadFiles();
+  }, []);
 
   return (
     <div className="row">

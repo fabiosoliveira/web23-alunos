@@ -7,9 +7,10 @@ export function onlyManager(req: Request, res: Response, next: NextFunction) {
 
   const loginData = res.locals.token as LoginData & { profile: Profile };
 
-  if (loginData.profile === Profile.MANAGER) {
+  if (+loginData.profile === Profile.MANAGER) {
     return next();
   }
+
   return res.sendStatus(403);
 }
 
