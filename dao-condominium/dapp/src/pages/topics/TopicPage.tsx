@@ -15,12 +15,14 @@ import {
   getVotes,
   Options,
   vote,
+  transfer,
 } from "../../services/Web3Service";
 import { useNavigate, useParams } from "react-router-dom";
 import Loader from "../../components/Loader";
 import If from "../../components/If";
 import TopicCategory from "../../components/TopicCategory";
 import TopicFiles from "./TopicFiles";
+import { ethers } from "ethers";
 
 function TopicPage() {
   const navigate = useNavigate();
@@ -189,6 +191,25 @@ function TopicPage() {
           });
       } else {
         setMessage("");
+      }
+    }
+  }
+
+  function btnTransferClick(): void {
+    setMessage("Connecting to wallet...wait...");
+    if (topic && topic.status === Status.APPROVED && title) {
+      if (
+        window.confirm(
+          `Are you sure to transfer ETH ${ethers.utils.formatEther(
+            topic.amount
+          )} for ${topic.responsible}?`
+        )
+      ) {
+        transfer(title, topic.amount)
+          .then((tx) => navigate("/topics?tx=" + tx.hash))
+          .catch((err) => {
+            if (err instanceof Error) setMessage(err.message);
+          });
       }
     }
   }
@@ -493,6 +514,57 @@ function TopicPage() {
                             thumb_down
                           </i>
                           Vote No
+                        </button>
+                      </If>
+                      <If
+                        condition={
+                          !hasManagerPermissions() &&
+                          topic.status === Status.VOTING &&
+                          !alredyVoted()
+                        }
+                      >
+                        <button
+                          className="btn btn-danger me-2"
+                          onClick={() => btnVoteClick(Options.NO)}
+                        >
+                          <i className="material-icons opacity-10 me-2">
+                            thumb_down
+                          </i>
+                          Vote No
+                        </button>
+                      </If>
+                      <If
+                        condition={
+                          !hasManagerPermissions() &&
+                          topic.status === Status.VOTING &&
+                          !alredyVoted()
+                        }
+                      >
+                        <button
+                          className="btn btn-danger me-2"
+                          onClick={() => btnVoteClick(Options.NO)}
+                        >
+                          <i className="material-icons opacity-10 me-2">
+                            thumb_down
+                          </i>
+                          Vote No
+                        </button>
+                      </If>
+                      <If
+                        condition={
+                          hasManagerPermissions() &&
+                          topic.status === Status.APPROVED &&
+                          topic.category === Category.SPENT
+                        }
+                      >
+                        <button
+                          className="btn bg-gradient-dark me-2"
+                          onClick={btnTransferClick}
+                        >
+                          <i className="material-icons opacity-10 me-2">
+                            payments
+                          </i>
+                          Transfer Payment
                         </button>
                       </If>
                       <span className="text-danger">{message}</span>

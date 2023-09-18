@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-import { getAddress, upgrade } from "../services/Web3Service";
+import { getAddress, getBalance, upgrade } from "../services/Web3Service";
 import Footer from "../components/Footer";
 import If from "../components/If";
 import Loader from "../components/Loader";
@@ -9,6 +9,7 @@ function Settings() {
   const [contract, setContrac] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [balance, setBalance] = useState("");
 
   function btnSaveClick(): void {
     setMessage("Saving data...waiit...");
@@ -24,7 +25,11 @@ function Settings() {
   useEffect(() => {
     setIsLoading(true);
     getAddress()
-      .then((address) => setContrac(address))
+      .then((address) => {
+        setContrac(address);
+        return getBalance();
+      })
+      .then((balance) => setBalance(balance))
       .catch((err) => {
         if (err instanceof Error) setMessage(err.message);
       })
@@ -51,6 +56,24 @@ function Settings() {
                   <If condition={isLoading}>
                     <Loader />
                   </If>
+                  <div className="row ms-3">
+                    <div className="col-md-6 mb-3">
+                      <div className="form-group">
+                        <label htmlFor="balance">
+                          Condominium Balance (ETH):
+                        </label>
+                        <div className="input-group input-group-outline">
+                          <input
+                            type="number"
+                            className="form-control"
+                            id="balance"
+                            value={balance}
+                            disabled={true}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <div className="row ms-3">
                     <div className="col-md-6 mb-3">
                       <div className="form-group">

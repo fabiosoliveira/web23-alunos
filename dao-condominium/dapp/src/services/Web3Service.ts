@@ -348,3 +348,20 @@ export async function vote(topic: string, option: Options) {
 
   return contract.vote(topic, option);
 }
+
+export async function transfer(topic: string, amount: ethers.BigNumber) {
+  if (getProfile() !== Profiler.MANAGER)
+    throw new Error("You do not have permission.");
+
+  const contract = getContractSigner();
+
+  return contract.transfer(topic, amount);
+}
+
+export async function getBalance(address?: string): Promise<string> {
+  if (!address) address = await getAddress();
+  const provider = getProvider();
+  const balance = await provider.getBalance(address);
+
+  return ethers.utils.formatEther(balance);
+}
