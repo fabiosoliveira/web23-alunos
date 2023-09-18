@@ -8,7 +8,7 @@
     "test": "hardhat test",
     "coverage": "hardhat coverage",
     "deploy:bsctest": "hardhat run scripts/deploy.ts --network bsctest",
-    "verify:bsctest": "hardhat verify --network bsctest 0xE2f7E9bb588b5A32b6d8d0f3099984a95E60B13d"
+    "verify:bsctest": "hardhat verify --network bsctest 0x519a35C73b9878fF5EEc2ADd1992Ee40cDF3726c"
   },
   "keywords": [],
   "author": "",

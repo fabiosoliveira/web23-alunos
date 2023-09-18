@@ -318,3 +318,33 @@ export async function getQuota(): Promise<ethers.BigNumber> {
 
   return contract.getQuota();
 }
+
+export enum Options {
+  EMPTY = 0,
+  YES = 1,
+  NO = 2,
+  ABSTENTION = 3,
+}
+
+export type Vote = {
+  resident: string;
+  residence: number;
+  timestamp: number;
+  option: Options;
+};
+
+export async function getVotes(topic: string): Promise<Vote[]> {
+  const contract = getContract();
+
+  const votes = await contract.getVotes(topic);
+  return votes.map((v) => ({
+    ...v,
+    timestamp: v.timestamp.toNumber(),
+  }));
+}
+
+export async function vote(topic: string, option: Options) {
+  const contract = getContractSigner();
+
+  return contract.vote(topic, option);
+}
