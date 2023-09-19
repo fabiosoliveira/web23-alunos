@@ -11,6 +11,8 @@ export enum Profiler {
   MANAGER = "MANAGER",
 }
 
+type ContractResponse = Promise<ethers.ContractTransaction & { hash: string }>;
+
 export type Resident = {
   wallet: string;
   isCounselor: boolean;
@@ -24,13 +26,13 @@ function getProfile() {
   return profile;
 }
 
-function getProvider(): ethers.providers.Web3Provider {
+function getProvider(): ethers.BrowserProvider {
   if (!window.ethereum) throw new Error("No MetaMask found");
 
-  return new ethers.providers.Web3Provider(window.ethereum);
+  return new ethers.BrowserProvider(window.ethereum);
 }
 
-function getContract(provider?: ethers.providers.Web3Provider) {
+function getContract(provider?: ethers.BrowserProvider) {
   if (!provider) provider = getProvider();
   return new ethers.Contract(
     ADAPTER_ADDRESS,
@@ -39,9 +41,9 @@ function getContract(provider?: ethers.providers.Web3Provider) {
   ) as unknown as ContractContext;
 }
 
-function getContractSigner(provider?: ethers.providers.Web3Provider) {
+async function getContractSigner(provider?: ethers.BrowserProvider) {
   if (!provider) provider = getProvider();
-  const signer = provider.getSigner(
+  const signer = await provider.getSigner(
     localStorage.getItem("account") || undefined
   );
   const contract = new ethers.Contract(
@@ -84,7 +86,7 @@ export async function doLogin() {
 
   localStorage.setItem("account", accounts[0]);
 
-  const signer = provider.getSigner();
+  const signer = await provider.getSigner();
   const timestamp = Date.now();
   const message = `Authenticating to Condominium. Timestamp: ${timestamp}`;
   const secret = await signer.signMessage(message);
@@ -114,7 +116,7 @@ export async function getAddress() {
 
 export type ResidentPage = {
   residents: Resident[];
-  total: ethers.BigNumber;
+  total: ethers.BigNumberish;
 };
 
 export async function getResidents(
@@ -133,7 +135,7 @@ export async function getResidents(
 
   return {
     residents,
-    total: ethers.BigNumber.from(result.total),
+    total: result.total as ethers.BigNumberish,
   };
 }
 
@@ -147,7 +149,7 @@ export async function upgrade(address: string) {
   if (getProfile() !== Profiler.MANAGER)
     throw new Error("You do not have permission.");
 
-  const contract = getContractSigner();
+  const contract = await getContractSigner();
   return contract.upgrade(address);
 }
 
@@ -167,23 +169,23 @@ export async function addResident(wallet: string, residenceId: number) {
   if (getProfile() === Profiler.RESIDENT)
     throw new Error("You do not have permission.");
 
-  const contract = getContractSigner();
-  return contract.addResident(wallet, residenceId);
+  const contract = await getContractSigner();
+  return contract.addResident(wallet, residenceId) as ContractResponse;
 }
 
 export async function removeResident(wallet: string) {
   if (getProfile() !== Profiler.MANAGER)
     throw new Error("You do not have permission.");
 
-  const contract = getContractSigner();
-  return contract.removeResident(wallet);
+  const contract = await getContractSigner();
+  return contract.removeResident(wallet) as ContractResponse;
 }
 
 export async function setCouncelor(wallet: string, isEntering: boolean) {
   if (getProfile() !== Profiler.MANAGER)
     throw new Error("You do not have permission.");
 
-  const contract = getContractSigner();
+  const contract = await getContractSigner();
   return contract.setCounselor(wallet, isEntering);
 }
 
@@ -207,116 +209,111 @@ export type Topic = {
   title: string;
   description: string;
   category: Category;
-  amount: ethers.BigNumber;
+  amount: ethers.BigNumberish;
   responsible: string;
   status?: Status;
-  createdDate?: number;
-  startDate?: number;
-  endDate?: number;
+  createdDate?: ethers.BigNumberish;
+  startDate?: ethers.BigNumberish;
+  endDate?: ethers.BigNumberish;
 };
 
 export type TopicPage = {
   topics: Topic[];
-  total: ethers.BigNumber;
+  total: ethers.BigNumberish;
 };
 
 export async function getTopics(page = 1, pageSize = 10): Promise<TopicPage> {
   const contract = getContract();
 
   const result = await contract.getTopics(page, pageSize);
-  const topics = result.topics
-    .filter((t) => t.title)
-    .map((t) => ({
-      ...t,
-      createdDate: t.createdDate.toNumber(),
-      startDate: t.startDate.toNumber(),
-      endDate: t.endDate.toNumber(),
-    }));
+  const topics = result.topics.filter((t) => t.title);
 
   return {
     topics,
-    total: ethers.BigNumber.from(result.total),
+    total: result.total as ethers.BigNumberish,
   };
 }
 
 export async function getTopic(title: string): Promise<Topic> {
   const contract = getContract();
 
-  const response = await contract.getTopic(title);
-
-  return {
-    ...response,
-    startDate: response.startDate.toNumber(),
-    endDate: response.endDate.toNumber(),
-    createdDate: response.createdDate.toNumber(),
-  };
+  return contract.getTopic(title);
 }
 
 export async function removeTopic(title: string) {
   if (getProfile() !== Profiler.MANAGER)
     throw new Error("You do not have permission.");
 
-  const contract = getContractSigner();
-  return contract.removeTopic(title);
+  const contract = await getContractSigner();
+  return contract.removeTopic(title) as ContractResponse;
 }
 
 export async function addTopic(topic: Topic) {
-  const contract = getContractSigner();
-  topic.amount = ethers.BigNumber.from(topic.amount || 0);
+  const contract = await getContractSigner();
+  topic.amount = ethers.toBigInt(topic.amount || 0);
   return contract.addTopic(
     topic.title,
     topic.description,
     topic.category,
     topic.amount,
     topic.responsible
-  );
+  ) as ContractResponse;
 }
 
 export async function editTopic(
   topicToEdit: string,
   description: string,
-  amount: ethers.BigNumber,
+  amount: ethers.BigNumberish,
   responsible: string
 ) {
   if (getProfile() !== Profiler.MANAGER)
     throw new Error("You do not have permission.");
 
-  const contract = getContractSigner();
-  amount = ethers.BigNumber.from(amount || 0);
-  return contract.editTopic(topicToEdit, description, amount, responsible);
+  const contract = await getContractSigner();
+  amount = ethers.toBigInt(amount || 0);
+  return contract.editTopic(
+    topicToEdit,
+    description,
+    amount,
+    responsible
+  ) as ContractResponse;
 }
 
 export async function openVoting(topic: string) {
   if (getProfile() !== Profiler.MANAGER)
     throw new Error("You do not have permission.");
 
-  const contract = getContractSigner();
+  const contract = await getContractSigner();
 
-  return contract.openVoting(topic);
+  return contract.openVoting(topic) as ContractResponse;
 }
 
 export async function closeVoting(topic: string) {
   if (getProfile() !== Profiler.MANAGER)
     throw new Error("You do not have permission.");
 
-  const contract = getContractSigner();
+  const contract = await getContractSigner();
 
-  return contract.closeVoting(topic);
+  return contract.closeVoting(topic) as ContractResponse;
 }
 
-export async function payQuota(residenceId: number, value: ethers.BigNumber) {
+export async function payQuota(
+  residenceId: number,
+  value: ethers.BigNumberish
+) {
   if (getProfile() !== Profiler.RESIDENT)
     throw new Error("You do not have permission.");
 
-  const contract = getContractSigner();
+  const contract = await getContractSigner();
 
   return contract.payQuota(residenceId, { value });
 }
 
-export async function getQuota(): Promise<ethers.BigNumber> {
+export async function getQuota(): Promise<ethers.BigNumberish> {
   const contract = getContract();
 
-  return contract.getQuota();
+  const quota = (await contract.getQuota()) as ethers.BigNumberish;
+  return quota;
 }
 
 export enum Options {
@@ -336,26 +333,22 @@ export type Vote = {
 export async function getVotes(topic: string): Promise<Vote[]> {
   const contract = getContract();
 
-  const votes = await contract.getVotes(topic);
-  return votes.map((v) => ({
-    ...v,
-    timestamp: v.timestamp.toNumber(),
-  }));
+  return contract.getVotes(topic);
 }
 
 export async function vote(topic: string, option: Options) {
-  const contract = getContractSigner();
+  const contract = await getContractSigner();
 
-  return contract.vote(topic, option);
+  return contract.vote(topic, option) as ContractResponse;
 }
 
-export async function transfer(topic: string, amount: ethers.BigNumber) {
+export async function transfer(topic: string, amount: ethers.BigNumberish) {
   if (getProfile() !== Profiler.MANAGER)
     throw new Error("You do not have permission.");
 
-  const contract = getContractSigner();
+  const contract = await getContractSigner();
 
-  return contract.transfer(topic, amount);
+  return contract.transfer(topic, amount) as ContractResponse;
 }
 
 export async function getBalance(address?: string): Promise<string> {
@@ -363,5 +356,5 @@ export async function getBalance(address?: string): Promise<string> {
   const provider = getProvider();
   const balance = await provider.getBalance(address);
 
-  return ethers.utils.formatEther(balance);
+  return ethers.formatEther(balance);
 }

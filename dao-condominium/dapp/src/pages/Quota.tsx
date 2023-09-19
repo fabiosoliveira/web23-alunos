@@ -13,9 +13,7 @@ import { ethers } from "ethers";
 
 function Quota() {
   const [resident, setResident] = useState<Resident>({} as Resident);
-  const [quota, setQuota] = useState<ethers.BigNumber>(
-    ethers.BigNumber.from(0)
-  );
+  const [quota, setQuota] = useState<ethers.BigNumberish>(0n);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -33,7 +31,7 @@ function Quota() {
   }
 
   function getDate(timestamp: number) {
-    const dateMs = timestamp * 1000;
+    const dateMs = ethers.toNumber(timestamp) * 1000;
     if (!dateMs) return "Never Payed";
     return new Date(dateMs).toDateString();
   }
@@ -55,13 +53,13 @@ function Quota() {
 
   function getNextPaymentClass(): string {
     const className = "input-group input-group-outline";
-    const dateMs = (resident.nextPayment as number) * 1000;
+    const dateMs = ethers.toNumber(resident.nextPayment) * 1000;
     if (!dateMs || dateMs < Date.now()) return className + "is-invalid";
     return className + "is-valid";
   }
 
   function shouldPay(): boolean {
-    return (resident.nextPayment as number) * 1000 <= Date.now();
+    return ethers.toNumber(resident.nextPayment) * 1000 <= Date.now();
   }
 
   return (
@@ -93,7 +91,7 @@ function Quota() {
                             type="number"
                             className="form-control"
                             id="quota"
-                            value={ethers.utils.formatEther(quota)}
+                            value={ethers.formatEther(quota)}
                             disabled={true}
                           />
                         </div>

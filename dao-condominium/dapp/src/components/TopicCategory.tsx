@@ -1,3 +1,5 @@
+import { ethers } from "ethers";
+
 type Props = {
   value: number | string;
   onChange: (evt: React.ChangeEvent<HTMLInputElement>) => void;
@@ -25,7 +27,7 @@ function TopicCategory({ onChange, value, disabled }: Props) {
     <select
       name="category"
       className="form-select px-3"
-      value={value}
+      value={ethers.toNumber(value)}
       onChange={onCategoryChange}
       disabled={disabled}
     >

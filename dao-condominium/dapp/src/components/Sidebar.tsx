@@ -58,7 +58,6 @@ function Sidebar() {
             <MenuItem href="quota" icon="payments" title="Quota" />
           ) : (
             <>
-              <MenuItem href="transfer" icon="payments" title="Transfer" />
               <MenuItem href="settings" icon="settings" title="Settings" />
             </>
           )}

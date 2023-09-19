@@ -57,8 +57,8 @@ function TopicPage() {
     }
   }
 
-  function getDate(timestamp: number) {
-    const dateMs = timestamp * 1000; // convert to milliseconds
+  function getDate(timestamp: ethers.BigNumberish) {
+    const dateMs = ethers.toNumber(timestamp) * 1000; // convert to milliseconds
     if (!dateMs) return "";
     return new Date(dateMs).toDateString();
   }
@@ -200,7 +200,7 @@ function TopicPage() {
     if (topic && topic.status === Status.APPROVED && title) {
       if (
         window.confirm(
-          `Are you sure to transfer ETH ${ethers.utils.formatEther(
+          `Are you sure to transfer ETH ${ethers.formatEther(
             topic.amount
           )} for ${topic.responsible}?`
         )
@@ -407,8 +407,10 @@ function TopicPage() {
                               className="form-control"
                               id="voting"
                               value={`${votes.length} votes (${
-                                votes.filter((v) => v.option === Options.YES)
-                                  .length
+                                votes.filter(
+                                  (v) =>
+                                    ethers.toNumber(v.option) === Options.YES
+                                ).length
                               } YES)`}
                               disabled={true}
                             />

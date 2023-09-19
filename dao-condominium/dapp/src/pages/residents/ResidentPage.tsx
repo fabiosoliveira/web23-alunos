@@ -9,6 +9,7 @@ import {
   doLogout,
   getResident,
   hasManagerPermissions,
+  hasResidentPermissions,
   setCouncelor,
 } from "../../services/Web3Service";
 import { useNavigate, useParams } from "react-router-dom";
@@ -19,14 +20,7 @@ import {
   addApiResident,
   updateApiResident,
 } from "../../services/ApiService";
-
-const RESIDENT_INITIAL_STATE = {
-  isCounselor: false,
-  isManager: false,
-  nextPayment: 0,
-  residence: 0,
-  wallet: "",
-} as Resident;
+import { ethers } from "ethers";
 
 function ResidentPage() {
   const navigate = useNavigate();
@@ -34,7 +28,7 @@ function ResidentPage() {
 
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [resident, setResident] = useState<Resident>(RESIDENT_INITIAL_STATE);
+  const [resident, setResident] = useState<Resident>({} as Resident);
   const [apiResident, setApiResident] = useState<ApiResident>(
     {} as ApiResident
   );
@@ -67,6 +61,7 @@ function ResidentPage() {
         .then((results) => navigate("/residents?tx=" + results[0].hash))
         .catch((err) => {
           if (err instanceof Error) setMessage(err.message);
+          console.error(err);
         });
     } else {
       const profile: Profiler = resident.isCounselor
@@ -84,25 +79,30 @@ function ResidentPage() {
         .then((results) => navigate("/residents?tx=" + wallet))
         .catch((err) => {
           if (err instanceof Error) setMessage(err.message);
+          console.error(err);
         });
     }
   }
 
   function getNextPayment() {
-    const dateMs = (resident.nextPayment as number) * 1000; // convert to milliseconds
+    if (!resident.nextPayment) return "Never Payed";
+
+    const dateMs = ethers.toNumber(resident.nextPayment) * 1000; // convert to milliseconds
     if (!dateMs) return "Never Payed";
     return new Date(dateMs).toDateString();
   }
 
   function getNextPaymentClass() {
     const className = "input-group input-group-outline ";
-    const dateMs = (resident.nextPayment as number) * 1000;
+    if (!resident.nextPayment) return className + "is-invalid";
+
+    const dateMs = ethers.toNumber(resident.nextPayment) * 1000;
     if (!dateMs || dateMs < Date.now()) return className + "is-invalid";
     return className + "is-valid";
   }
 
   useEffect(() => {
-    if (hasManagerPermissions()) {
+    if (hasResidentPermissions()) {
       doLogout();
       navigate("/");
     }
@@ -119,6 +119,8 @@ function ResidentPage() {
           setApiResident(results[1]);
         })
         .catch((err) => {
+          console.log(err);
+
           if (err instanceof Error) setMessage(err.message);
         })
         .finally(() => setIsLoading(false));

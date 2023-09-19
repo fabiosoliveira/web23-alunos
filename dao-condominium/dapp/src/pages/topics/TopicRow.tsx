@@ -5,6 +5,7 @@ import {
   hasManagerPermissions,
 } from "../../services/Web3Service";
 import If from "../../components/If";
+import { ethers } from "ethers";
 
 type Props = {
   data: Topic;
@@ -20,7 +21,7 @@ type Props = {
 function TopicRow({ data, onDelete }: Props) {
   function getDate() {
     if (!data.createdDate) return "";
-    const dateMs = data.createdDate * 1000;
+    const dateMs = ethers.toNumber(data.createdDate) * 1000;
 
     return (
       <p className={"text-xs mb-0 ms-3"}>{new Date(dateMs).toDateString()}</p>
@@ -35,7 +36,7 @@ function TopicRow({ data, onDelete }: Props) {
 
   function getCategory() {
     let text = "";
-    switch (data.category) {
+    switch (ethers.toNumber(data.category)) {
       case Category.DECISION:
         text = "Decision";
         break;

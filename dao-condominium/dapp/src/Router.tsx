@@ -2,7 +2,6 @@ import { Route, BrowserRouter, Routes, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Topics from "./pages/topics";
 import TopicPage from "./pages/topics/TopicPage";
-import Transfer from "./pages/Transfer";
 import { Profiler, doLogout } from "./services/Web3Service";
 import Settings from "./pages/Settings";
 import Residents from "./pages/residents";
@@ -36,14 +35,6 @@ function Router() {
             <PrivateRoute>
               <Topics />
             </PrivateRoute>
-          }
-        />
-        <Route
-          path="/transfer"
-          element={
-            <ManagerRoute>
-              <Transfer />
-            </ManagerRoute>
           }
         />
         <Route

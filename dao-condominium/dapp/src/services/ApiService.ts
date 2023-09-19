@@ -1,4 +1,4 @@
-import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
+import { keccak256, toUtf8Bytes } from "ethers";
 import axios from "./AxiosConfig";
 import { hasManagerPermissions, hasCounselorPermissions } from "./Web3Service";
 

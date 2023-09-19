@@ -15,7 +15,9 @@ type Props = {
  */
 function ResidentRow({ data, onDelete }: Props) {
   function getNextPayment() {
-    const dateMs = ethers.BigNumber.from(data.nextPayment).toNumber() * 1000; // convert to milliseconds
+    let dateMs = 0;
+    if (!data.nextPayment) dateMs = ethers.toNumber(data.nextPayment) * 1000;
+
     const text = !dateMs ? "Never Payed" : new Date(dateMs).toDateString();
     let color = "text-success";
 
@@ -44,7 +46,7 @@ function ResidentRow({ data, onDelete }: Props) {
       </td>
       <td>
         <p className="text-xs font-weight-bold mb-0 px-3">
-          {ethers.BigNumber.from(data.residence).toNumber()}
+          {ethers.toBigInt(data.residence).toString()}
         </p>
       </td>
       <td>

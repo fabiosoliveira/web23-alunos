@@ -1,5 +1,9 @@
 [
-  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
   {
     "anonymous": false,
     "inputs": [
@@ -78,8 +82,16 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "resident", "type": "address" },
-      { "internalType": "uint16", "name": "residenceId", "type": "uint16" }
+      {
+        "internalType": "address",
+        "name": "resident",
+        "type": "address"
+      },
+      {
+        "internalType": "uint16",
+        "name": "residenceId",
+        "type": "uint16"
+      }
     ],
     "name": "addResident",
     "outputs": [],
@@ -88,15 +100,31 @@
   },
   {
     "inputs": [
-      { "internalType": "string", "name": "title", "type": "string" },
-      { "internalType": "string", "name": "description", "type": "string" },
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
       {
         "internalType": "enum CondominiumLib.Category",
         "name": "category",
         "type": "uint8"
       },
-      { "internalType": "uint256", "name": "amount", "type": "uint256" },
-      { "internalType": "address", "name": "responsible", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "responsible",
+        "type": "address"
+      }
     ],
     "name": "addTopic",
     "outputs": [],
@@ -104,7 +132,13 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "string", "name": "title", "type": "string" }],
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      }
+    ],
     "name": "closeVoting",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -112,10 +146,26 @@
   },
   {
     "inputs": [
-      { "internalType": "string", "name": "topicToEdit", "type": "string" },
-      { "internalType": "string", "name": "description", "type": "string" },
-      { "internalType": "uint256", "name": "amount", "type": "uint256" },
-      { "internalType": "address", "name": "responsible", "type": "address" }
+      {
+        "internalType": "string",
+        "name": "topicToEdit",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "responsible",
+        "type": "address"
+      }
     ],
     "name": "editTopic",
     "outputs": [],
@@ -125,36 +175,74 @@
   {
     "inputs": [],
     "name": "getAddress",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getManager",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "getQuota",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "resident", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "resident",
+        "type": "address"
+      }
     ],
     "name": "getResident",
     "outputs": [
       {
         "components": [
-          { "internalType": "address", "name": "wallet", "type": "address" },
-          { "internalType": "uint16", "name": "residence", "type": "uint16" },
-          { "internalType": "bool", "name": "isCounselor", "type": "bool" },
-          { "internalType": "bool", "name": "isManager", "type": "bool" },
+          {
+            "internalType": "address",
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "internalType": "uint16",
+            "name": "residence",
+            "type": "uint16"
+          },
+          {
+            "internalType": "bool",
+            "name": "isCounselor",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isManager",
+            "type": "bool"
+          },
           {
             "internalType": "uint256",
             "name": "nextPayment",
@@ -171,8 +259,16 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "page", "type": "uint256" },
-      { "internalType": "uint256", "name": "pageSize", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "page",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pageSize",
+        "type": "uint256"
+      }
     ],
     "name": "getResidents",
     "outputs": [
@@ -190,8 +286,16 @@
                 "name": "residence",
                 "type": "uint16"
               },
-              { "internalType": "bool", "name": "isCounselor", "type": "bool" },
-              { "internalType": "bool", "name": "isManager", "type": "bool" },
+              {
+                "internalType": "bool",
+                "name": "isCounselor",
+                "type": "bool"
+              },
+              {
+                "internalType": "bool",
+                "name": "isManager",
+                "type": "bool"
+              },
               {
                 "internalType": "uint256",
                 "name": "nextPayment",
@@ -202,7 +306,11 @@
             "name": "residents",
             "type": "tuple[]"
           },
-          { "internalType": "uint256", "name": "total", "type": "uint256" }
+          {
+            "internalType": "uint256",
+            "name": "total",
+            "type": "uint256"
+          }
         ],
         "internalType": "struct CondominiumLib.ResidentPage",
         "name": "",
@@ -213,13 +321,27 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "string", "name": "title", "type": "string" }],
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      }
+    ],
     "name": "getTopic",
     "outputs": [
       {
         "components": [
-          { "internalType": "string", "name": "title", "type": "string" },
-          { "internalType": "string", "name": "description", "type": "string" },
+          {
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          },
           {
             "internalType": "enum CondominiumLib.Status",
             "name": "status",
@@ -230,14 +352,26 @@
             "name": "createdDate",
             "type": "uint256"
           },
-          { "internalType": "uint256", "name": "startDate", "type": "uint256" },
-          { "internalType": "uint256", "name": "endDate", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "startDate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "endDate",
+            "type": "uint256"
+          },
           {
             "internalType": "enum CondominiumLib.Category",
             "name": "category",
             "type": "uint8"
           },
-          { "internalType": "uint256", "name": "amount", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
           {
             "internalType": "address",
             "name": "responsible",
@@ -254,8 +388,16 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "page", "type": "uint256" },
-      { "internalType": "uint256", "name": "pageSize", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "page",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pageSize",
+        "type": "uint256"
+      }
     ],
     "name": "getTopics",
     "outputs": [
@@ -263,7 +405,11 @@
         "components": [
           {
             "components": [
-              { "internalType": "string", "name": "title", "type": "string" },
+              {
+                "internalType": "string",
+                "name": "title",
+                "type": "string"
+              },
               {
                 "internalType": "string",
                 "name": "description",
@@ -309,7 +455,11 @@
             "name": "topics",
             "type": "tuple[]"
           },
-          { "internalType": "uint256", "name": "total", "type": "uint256" }
+          {
+            "internalType": "uint256",
+            "name": "total",
+            "type": "uint256"
+          }
         ],
         "internalType": "struct CondominiumLib.TopicPage",
         "name": "",
@@ -321,20 +471,36 @@
   },
   {
     "inputs": [
-      { "internalType": "string", "name": "topicTitle", "type": "string" }
+      {
+        "internalType": "string",
+        "name": "topicTitle",
+        "type": "string"
+      }
     ],
     "name": "getVotes",
     "outputs": [
       {
         "components": [
-          { "internalType": "address", "name": "resident", "type": "address" },
-          { "internalType": "uint16", "name": "residence", "type": "uint16" },
+          {
+            "internalType": "address",
+            "name": "resident",
+            "type": "address"
+          },
+          {
+            "internalType": "uint16",
+            "name": "residence",
+            "type": "uint16"
+          },
           {
             "internalType": "enum CondominiumLib.Options",
             "name": "option",
             "type": "uint8"
           },
-          { "internalType": "uint256", "name": "timestamp", "type": "uint256" }
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
         ],
         "internalType": "struct CondominiumLib.Vote[]",
         "name": "",
@@ -345,7 +511,13 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "string", "name": "title", "type": "string" }],
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      }
+    ],
     "name": "openVoting",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -354,13 +526,23 @@
   {
     "inputs": [],
     "name": "owner",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint16", "name": "residenceId", "type": "uint16" }
+      {
+        "internalType": "uint16",
+        "name": "residenceId",
+        "type": "uint16"
+      }
     ],
     "name": "payQuota",
     "outputs": [],
@@ -369,7 +551,11 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "resident", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "resident",
+        "type": "address"
+      }
     ],
     "name": "removeResident",
     "outputs": [],
@@ -377,7 +563,13 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "string", "name": "title", "type": "string" }],
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      }
+    ],
     "name": "removeTopic",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -385,8 +577,16 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "resident", "type": "address" },
-      { "internalType": "bool", "name": "isEntering", "type": "bool" }
+      {
+        "internalType": "address",
+        "name": "resident",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "isEntering",
+        "type": "bool"
+      }
     ],
     "name": "setCounselor",
     "outputs": [],
@@ -395,8 +595,16 @@
   },
   {
     "inputs": [
-      { "internalType": "string", "name": "topicTitle", "type": "string" },
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+      {
+        "internalType": "string",
+        "name": "topicTitle",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
     ],
     "name": "transfer",
     "outputs": [],
@@ -418,7 +626,11 @@
   },
   {
     "inputs": [
-      { "internalType": "string", "name": "title", "type": "string" },
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
       {
         "internalType": "enum CondominiumLib.Options",
         "name": "option",

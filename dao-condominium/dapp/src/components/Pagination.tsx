@@ -3,7 +3,7 @@ import If from "./If";
 import { Link, useLocation } from "react-router-dom";
 
 type Props = {
-  count: ethers.BigNumber;
+  count: ethers.BigNumberish;
   pageSize: number;
 };
 
@@ -25,10 +25,10 @@ function Pagination({ count, pageSize }: Props) {
   }
 
   function getBottom() {
-    if (count.toNumber() > 0) {
+    if (ethers.toNumber(count) > 0) {
       return (
         <div className="fw-normal small mt-4 mt-lg-0">
-          <b>{count.toNumber()}</b> result(s).
+          <b>{ethers.toNumber(count)}</b> result(s).
         </div>
       );
     }
@@ -40,7 +40,7 @@ function Pagination({ count, pageSize }: Props) {
     );
   }
 
-  const pagesQty = Math.ceil(count.toNumber() / pageSize);
+  const pagesQty = Math.ceil(ethers.toNumber(count) / pageSize);
   const pages = Array.from({ length: pagesQty }, (_, index) => index + 1);
 
   return (

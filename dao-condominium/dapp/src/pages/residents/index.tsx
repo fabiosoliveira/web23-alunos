@@ -22,7 +22,7 @@ function Residents() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [count, setCount] = useState(ethers.BigNumber.from(0));
+  const [count, setCount] = useState<ethers.BigNumberish>(0n);
 
   function useQuery() {
     return new URLSearchParams(useLocation().search);
@@ -39,6 +39,7 @@ function Residents() {
       })
       .catch((err) => {
         if (err instanceof Error) setError(err.message);
+        console.error(err);
       })
       .finally(() => setIsLoading(false));
 
@@ -61,6 +62,7 @@ function Residents() {
       .then((tx) => navigate("/residents?tx=" + tx[0].hash))
       .catch((err) => {
         if (err instanceof Error) setError(err.message);
+        console.error(err);
       })
       .finally(() => setIsLoading(false));
   }
