@@ -12,5 +12,5 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 // import "hardhat/console.sol";
 
 contract ProtoNFT is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable {
-    
+    constructor() ERC721("ProtoNFT", "PNFT") {}
 }
