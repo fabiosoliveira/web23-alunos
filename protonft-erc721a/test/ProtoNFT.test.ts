@@ -43,6 +43,12 @@ describe("ProtoNFT", function () {
     expect(totalSupply).to.equal(1, "Can't mint");
   });
 
+  it("Should NOT mint (payment)", async function () {
+    const { contract, owner } = await loadFixture(deployFixture);
+
+    await expect(contract.mint(1)).to.be.revertedWith("Insufficient payment");
+  });
+
   it("Should burn", async function () {
     const { contract, owner } = await loadFixture(deployFixture);
 
@@ -286,6 +292,35 @@ describe("ProtoNFT", function () {
     expect(await contract.supportsInterface("0x80ac58cd")).to.equal(
       true,
       "Can't supports interface"
+    );
+  });
+
+  it("Should withdraw", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const ownerBalanceBefore = await ethers.provider.getBalance(owner);
+
+    const instance = contract.connect(otherAccount);
+    await instance.mint(1, { value: ethers.parseEther("0.01") });
+
+    await contract.withdraw();
+
+    const contractBalance = await ethers.provider.getBalance(contract);
+    const ownerBalanceAfter = await ethers.provider.getBalance(owner);
+
+    expect(contractBalance).to.equal(0, "Can't withdraw");
+    expect(ownerBalanceAfter).to.greaterThan(
+      ownerBalanceBefore,
+      "Can't withdraw"
+    );
+  });
+
+  it("Should NOT withdraw (permission)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    const instance = contract.connect(otherAccount);
+    await expect(instance.withdraw()).to.be.revertedWith(
+      "You do not have permission"
     );
   });
 });
