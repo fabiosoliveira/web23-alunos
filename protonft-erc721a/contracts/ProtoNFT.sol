@@ -20,7 +20,7 @@ contract ProtoNFT is ERC721A {
     }
 
     function burn(uint256 tokenId) external {
-        super._burn(tokenId);
+        super._burn(tokenId, true);
     }
 
     function withdraw() external {

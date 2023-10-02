@@ -31,16 +31,14 @@ describe("ProtoNFT", function () {
   it("Should mint", async function () {
     const { contract, owner } = await loadFixture(deployFixture);
 
-    await contract.mint();
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
 
     const balance = await contract.balanceOf(owner.address);
-    const tokenId = await contract.tokenByIndex(0);
+    const tokenId = 0;
     const ownerOf = await contract.ownerOf(tokenId);
-    const ownerTokenId = await contract.tokenOfOwnerByIndex(owner.address, 0);
     const totalSupply = await contract.totalSupply();
 
     expect(balance).to.equal(1, "Can't mint");
-    expect(tokenId).to.equal(ownerTokenId, "Can't mint");
     expect(ownerOf).to.equal(owner.address, "Can't mint");
     expect(totalSupply).to.equal(1, "Can't mint");
   });
@@ -48,8 +46,8 @@ describe("ProtoNFT", function () {
   it("Should burn", async function () {
     const { contract, owner } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     await contract.burn(tokenId);
 
@@ -63,8 +61,8 @@ describe("ProtoNFT", function () {
   it("Should burn (approved)", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     await contract.approve(otherAccount.address, tokenId);
     const approved = await contract.getApproved(tokenId);
@@ -83,8 +81,8 @@ describe("ProtoNFT", function () {
   it("Should burn (approved for all)", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     await contract.setApprovalForAll(otherAccount.address, true);
     const approved = await contract.isApprovedForAll(
@@ -106,31 +104,33 @@ describe("ProtoNFT", function () {
   it("Should NOT burn (not exists)", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await expect(contract.burn(1)).to.be.revertedWith(
-      "ERC721: invalid token ID"
+    await expect(contract.burn(1)).to.be.revertedWithCustomError(
+      contract,
+      "OwnerQueryForNonexistentToken"
     );
   });
 
   it("Should NOT burn (permission)", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
     const instance = contract.connect(otherAccount);
 
-    await expect(instance.burn(tokenId)).to.be.revertedWith(
-      "ERC721: caller is not token owner or approved"
+    await expect(instance.burn(tokenId)).to.be.revertedWithCustomError(
+      contract,
+      "TransferCallerNotOwnerNorApproved"
     );
   });
 
   it("Should has URI metadata", async function () {
     const { contract } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     expect(await contract.tokenURI(tokenId)).to.equal(
-      "https://www.fabio.com.br/nfts/1.json",
+      "https://www.fabio.com.br/nfts/0.json",
       "Can't get URI Metadata"
     );
   });
@@ -138,37 +138,33 @@ describe("ProtoNFT", function () {
   it("Should NOT URI metadata", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await expect(contract.tokenURI(1)).to.be.revertedWith(
-      "ERC721: invalid token ID"
+    await expect(contract.tokenURI(1)).to.be.revertedWithCustomError(
+      contract,
+      "URIQueryForNonexistentToken"
     );
   });
 
   it("Should transfer", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     await contract.transferFrom(owner.address, otherAccount.address, tokenId);
     const balanceFrom = await contract.balanceOf(owner.address);
     const balanceTo = await contract.balanceOf(otherAccount.address);
     const ownerOf = await contract.ownerOf(tokenId);
-    const ownerTokenId = await contract.tokenOfOwnerByIndex(
-      otherAccount.address,
-      0
-    );
 
     expect(balanceFrom).to.equal(0, "Can't transfer");
     expect(balanceTo).to.equal(1, "Can't transfer");
     expect(ownerOf).to.equal(otherAccount.address, "Can't transfer");
-    expect(tokenId).to.equal(ownerTokenId, "Can't transfer");
   });
 
   it("Should emit transfer", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     await expect(
       contract.transferFrom(owner.address, otherAccount.address, tokenId)
@@ -180,8 +176,8 @@ describe("ProtoNFT", function () {
   it("Should transfer (approved)", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     await contract.approve(otherAccount.address, tokenId);
     const approved = await contract.getApproved(tokenId);
@@ -201,8 +197,8 @@ describe("ProtoNFT", function () {
   it("Should emit approval", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     await expect(contract.approve(otherAccount.address, tokenId))
       .to.emit(contract, "Approval")
@@ -212,8 +208,8 @@ describe("ProtoNFT", function () {
   it("Should clear approvals", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     await contract.approve(otherAccount.address, tokenId);
 
@@ -230,8 +226,8 @@ describe("ProtoNFT", function () {
   it("Should transfer (approved for all)", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     await contract.setApprovalForAll(otherAccount.address, true);
     const approved = await contract.isApprovedForAll(
@@ -254,7 +250,7 @@ describe("ProtoNFT", function () {
   it("Should emit approval for all", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
 
     await expect(contract.setApprovalForAll(otherAccount.address, true))
       .to.emit(contract, "ApprovalForAll")
@@ -264,13 +260,16 @@ describe("ProtoNFT", function () {
   it("Should NOT transfer (permission)", async function () {
     const { contract, owner, otherAccount } = await loadFixture(deployFixture);
 
-    await contract.mint();
-    const tokenId = await contract.tokenByIndex(0);
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+    const tokenId = 0;
 
     const instance = contract.connect(otherAccount);
     await expect(
       instance.transferFrom(owner.address, otherAccount.address, tokenId)
-    ).to.be.rejectedWith("ERC721: caller is not token owner or approved");
+    ).to.be.revertedWithCustomError(
+      contract,
+      "TransferCallerNotOwnerNorApproved"
+    );
   });
 
   it("Should NOT transfer (exists)", async function () {
@@ -278,7 +277,7 @@ describe("ProtoNFT", function () {
 
     await expect(
       contract.transferFrom(owner.address, otherAccount.address, 1)
-    ).to.be.rejectedWith("ERC721: invalid token ID");
+    ).to.be.revertedWithCustomError(contract, "OwnerQueryForNonexistentToken");
   });
 
   it("Should supports interface", async function () {
