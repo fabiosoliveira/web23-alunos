@@ -31,7 +31,7 @@ contract ProtoNFT is ERC721A {
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "https://www.fabio.com.br/nfts/";
+        return "ipfs://QmQKb1mw9fZNwdLsDpTmvnwocbVfSiDP8CtvjuerunYqCv/";
     }
 
     function tokenURI(uint256 tokenId) public view override(ERC721A) returns (string memory) {

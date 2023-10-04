@@ -136,7 +136,7 @@ describe("ProtoNFT", function () {
     const tokenId = 0;
 
     expect(await contract.tokenURI(tokenId)).to.equal(
-      "https://www.fabio.com.br/nfts/0.json",
+      "ipfs://QmQKb1mw9fZNwdLsDpTmvnwocbVfSiDP8CtvjuerunYqCv/0.json",
       "Can't get URI Metadata"
     );
   });
