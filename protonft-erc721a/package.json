@@ -6,8 +6,8 @@
   "scripts": {
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "deploy": "npx hardhat run scripts/deploy.js --network avaxtest",
-    "verify": "npx hardhat verify 0x0... --network avaxtest"
+    "deploy": "npx hardhat run scripts/deploy.ts --network bsctest",
+    "verify": "npx hardhat verify 0x69CB007356c071637b308f13aECA5Cbdca64caBF --network bsctest"
   },
   "keywords": [],
   "author": "Fábio Oliveira",
