@@ -28,8 +28,11 @@ export default function Mint() {
     event: MouseEvent<HTMLButtonElement, MouseEvent>
   ): void {
     setMessage("Logging In...");
-    setWallet("abc");
-    localStorage.setItem("wallet", "abc");
+    setWallet("0xF357fBCE8c00da01eeF37670413F5f2c2aB64191");
+    localStorage.setItem(
+      "wallet",
+      "0xF357fBCE8c00da01eeF37670413F5f2c2aB64191"
+    );
     setMessage("");
   }
   function btnLogoutClick(
@@ -55,7 +58,7 @@ export default function Mint() {
           {wallet ? (
             <>
               <a
-                href={`https://testnet.opensea.io/${wallet}`}
+                href={`${process.env.OPENSEA_URL}/${wallet}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
