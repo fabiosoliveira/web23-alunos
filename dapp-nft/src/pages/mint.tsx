@@ -1,4 +1,4 @@
-import { login } from "@/services/Web3Service.";
+import { login, mint } from "@/services/Web3Service.";
 import Head from "next/head";
 import { ChangeEvent, useEffect, useState } from "react";
 
@@ -20,8 +20,9 @@ export default function Mint() {
 
   function btnMintClick(): void {
     setMessage("Minting...");
-    alert("Minting...");
-    setMessage("");
+    mint(quantity)
+      .then((tx) => setMessage("Tx Id: " + (tx || "error")))
+      .catch((error) => setMessage(error.message));
   }
 
   function btnLoginClick(): void {
