@@ -1,5 +1,6 @@
+import { login } from "@/services/Web3Service.";
 import Head from "next/head";
-import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 export default function Mint() {
   const [quantity, setQuantity] = useState(1);
@@ -17,27 +18,26 @@ export default function Mint() {
     setQuantity(parseInt(event.target.value));
   }
 
-  function btnMintClick(
-    event: MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void {
+  function btnMintClick(): void {
     setMessage("Minting...");
     alert("Minting...");
     setMessage("");
   }
-  function btnLoginClick(
-    event: MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void {
+
+  function btnLoginClick(): void {
     setMessage("Logging In...");
-    setWallet("0xF357fBCE8c00da01eeF37670413F5f2c2aB64191");
-    localStorage.setItem(
-      "wallet",
-      "0xF357fBCE8c00da01eeF37670413F5f2c2aB64191"
-    );
-    setMessage("");
+    login()
+      .then((wallet) => {
+        setWallet(wallet);
+        localStorage.setItem("wallet", wallet);
+        setMessage("");
+      })
+      .catch((error) => {
+        setMessage(error.message);
+      });
   }
-  function btnLogoutClick(
-    event: MouseEvent<HTMLButtonElement, MouseEvent>
-  ): void {
+
+  function btnLogoutClick(): void {
     setMessage("Logging Out...");
     setWallet("");
     localStorage.removeItem("wallet");
