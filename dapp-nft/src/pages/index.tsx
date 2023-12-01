@@ -4,7 +4,7 @@ import Layout from "../components/Layout";
 import Image from "next/image";
 
 const IndexPage = () => (
-  <Layout title="Home | Next.js + TypeScript Example">
+  <Layout title="SpiderPig NFT Collection">
     <Hero />
     <Services />
     <Team />
