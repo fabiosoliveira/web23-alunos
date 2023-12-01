@@ -39,12 +39,11 @@ const Hero = () => (
         <div className="w-full lg:w-6/12 px-4 ml-auto mr-auto text-center">
           <div className="pr-12">
             <h1 className="text-white font-semibold text-5xl">
-              Your story starts with us.
+              Welcome to SpiderPig' Metaverse
             </h1>
             <p className="mt-4 text-lg text-gray-300">
-              This is a simple example of a Landing Page you can build using
-              Tailwind Starter Kit. It features multiple CSS components based on
-              the Tailwindcss design system.
+              If you are an web3 student and want to learn more about web3, you
+              must acquire your exclusive NFT from our collection.
             </p>
           </div>
         </div>
@@ -80,12 +79,12 @@ const Services = () => (
           <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
             <div className="px-4 py-5 flex-auto">
               <div className="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-red-400">
-                <i className="fas fa-award"></i>
+                <img src="/award.svg" />
               </div>
-              <h6 className="text-xl font-semibold">Awarded Agency</h6>
+              <h6 className="text-xl font-semibold">VIP Community</h6>
               <p className="mt-2 mb-4 text-gray-600">
-                Divide details about your product or agency work into parts. A
-                paragraph describing a feature will be enough.
+                You'll have access to our private comminity at Telegram, with
+                hundreds of developers helping each other.
               </p>
             </div>
           </div>
@@ -95,12 +94,12 @@ const Services = () => (
           <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
             <div className="px-4 py-5 flex-auto">
               <div className="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-blue-400">
-                <i className="fas fa-retweet"></i>
+                <img src="/star.svg" />
               </div>
-              <h6 className="text-xl font-semibold">Free Revisions</h6>
+              <h6 className="text-xl font-semibold">Top Course</h6>
               <p className="mt-2 mb-4 text-gray-600">
-                Keep you user engaged by providing meaningful information.
-                Remember that by this time, the user is curious.
+                You'll be enrolled in an web3 full course named Web23, that will
+                improve your web2 skills and reach new levels.
               </p>
             </div>
           </div>
@@ -110,12 +109,12 @@ const Services = () => (
           <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
             <div className="px-4 py-5 flex-auto">
               <div className="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-green-400">
-                <i className="fas fa-fingerprint"></i>
+                <img src="/user.svg" />
               </div>
-              <h6 className="text-xl font-semibold">Verified Company</h6>
+              <h6 className="text-xl font-semibold">Career Assist</h6>
               <p className="mt-2 mb-4 text-gray-600">
-                Write a few lines about each one. A paragraph describing a
-                feature will be enough. Keep you user engaged!
+                Oportunities, support, CV analysis and group mentoring for devs
+                who wants a successful web3 career.
               </p>
             </div>
           </div>
