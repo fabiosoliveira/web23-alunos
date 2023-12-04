@@ -26,7 +26,9 @@ function Footer(): ReactElement {
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap">
           <div className="w-full lg:w-6/12 px-4">
-            <h4 className="text-3xl font-semibold">Let's keep in touch!</h4>
+            <h4 className="text-3xl font-semibold">
+              Let&apos;s keep in touch!
+            </h4>
             <h5 className="text-lg mt-0 mb-2 text-gray-700">
               Find me on any of these platforms, I respond daily.
             </h5>
