@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: "export",
+  output: "standalone",
   env: {
     CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS,
     NFT_PRICE: process.env.NFT_PRICE,
