@@ -113,4 +113,128 @@ describe("Multitoken", function () {
       instance.burn(owner.address, 0, 1)
     ).to.be.revertedWithCustomError(contract, "ERC1155MissingApprovalForAll");
   });
+
+  it("Should safeTransferFrom", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await contract.mint(0, { value: ethers.parseEther("0.01") });
+
+    await contract.safeTransferFrom(
+      owner.address,
+      otherAccount.address,
+      0,
+      1,
+      "0x00000000"
+    );
+
+    const balances = await contract.balanceOfBatch(
+      [owner.address, otherAccount.address],
+      [0, 0]
+    );
+    const supply = await contract.currentSupply(0);
+
+    expect(balances[0]).to.equal(0, "Cannot safe transfer");
+    expect(balances[1]).to.equal(1, "Cannot safe transfer");
+    expect(supply).to.equal(49, "Cannot safe transfer");
+  });
+
+  it("Should emit transfer event", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await contract.mint(0, { value: ethers.parseEther("0.01") });
+
+    await expect(
+      contract.safeTransferFrom(
+        owner.address,
+        otherAccount.address,
+        0,
+        1,
+        "0x00000000"
+      )
+    )
+      .to.emit(contract, "TransferSingle")
+      .withArgs(owner.address, owner.address, otherAccount.address, 0, 1);
+  });
+
+  it("Should NOT safeTransferFrom (balance)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await expect(
+      contract.safeTransferFrom(
+        owner.address,
+        otherAccount.address,
+        0,
+        1,
+        "0x00000000"
+      )
+    ).to.be.revertedWithCustomError(contract, "ERC1155InsufficientBalance");
+  });
+
+  it("Should NOT safeTransferFrom (exists)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await expect(
+      contract.safeTransferFrom(
+        owner.address,
+        otherAccount.address,
+        10,
+        1,
+        "0x00000000"
+      )
+    ).to.be.revertedWithCustomError(contract, "ERC1155InsufficientBalance");
+  });
+
+  it("Should NOT safeTransferFrom (permission)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await contract.mint(0, { value: ethers.parseEther("0.01") });
+
+    const instance = contract.connect(otherAccount);
+
+    await expect(
+      instance.safeTransferFrom(
+        owner.address,
+        otherAccount.address,
+        0,
+        1,
+        "0x00000000"
+      )
+    ).to.be.revertedWithCustomError(contract, "ERC1155MissingApprovalForAll");
+  });
+
+  it("Should NOT safeBatchTransferFrom (array mismatch)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await contract.mint(0, { value: ethers.parseEther("0.01") });
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+
+    await expect(
+      contract.safeBatchTransferFrom(
+        owner.address,
+        otherAccount.address,
+        [0, 1],
+        [1],
+        "0x00000000"
+      )
+    ).to.be.revertedWithCustomError(contract, "ERC1155InvalidArrayLength");
+  });
+
+  it("Should NOT safeBatchTransferFrom (permission)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await contract.mint(0, { value: ethers.parseEther("0.01") });
+    await contract.mint(1, { value: ethers.parseEther("0.01") });
+
+    const instance = contract.connect(otherAccount);
+
+    await expect(
+      instance.safeBatchTransferFrom(
+        owner.address,
+        otherAccount.address,
+        [0, 1],
+        [1, 1],
+        "0x00000000"
+      )
+    ).to.be.revertedWithCustomError(contract, "ERC1155MissingApprovalForAll");
+  });
 });
