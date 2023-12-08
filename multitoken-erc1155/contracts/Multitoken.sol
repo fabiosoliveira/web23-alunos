@@ -18,7 +18,7 @@ contract Multitoken is ERC1155, ERC1155Burnable {
 
     uint public tokenPrice = 0.01 ether;
 
-    string public constant BASE_URL = "https://www.fabio.com.br/tokens/";
+    string public constant BASE_URL = "ipfs://QmZymW65mbp4MD35FSb4K9Y4vLMVAZEtWnygwU24X4MD8T/";
 
     address payable public immutable owner;
 
@@ -36,6 +36,7 @@ contract Multitoken is ERC1155, ERC1155Burnable {
     }
 
     function uri(uint256 id) public pure override returns (string memory) {
+        require(id < 3, "This token does not exist");
         return string.concat(BASE_URL, Strings.toString(id), ".json");
     }
 

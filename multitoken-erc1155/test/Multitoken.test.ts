@@ -237,4 +237,73 @@ describe("Multitoken", function () {
       )
     ).to.be.revertedWithCustomError(contract, "ERC1155MissingApprovalForAll");
   });
+
+  it("Should supports interface", async function () {
+    const { contract } = await loadFixture(deployFixture);
+
+    const support = await contract.supportsInterface("0xd9b67a26");
+
+    expect(support).to.equal(true, "Does not support interface ERC-1155");
+  });
+
+  it("Should withdraw", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+    const contractAddress = await contract.getAddress();
+
+    const instance = contract.connect(otherAccount);
+    await instance.mint(0, { value: ethers.parseEther("0.01") });
+
+    const contractBalanceBefore = await ethers.provider.getBalance(
+      contractAddress
+    );
+    const ownerBalanceBefore = await ethers.provider.getBalance(owner.address);
+
+    await contract.withdraw();
+
+    const contractBalanceAfter = await ethers.provider.getBalance(
+      contractAddress
+    );
+    const ownerBalanceAfter = await ethers.provider.getBalance(owner.address);
+
+    expect(contractBalanceBefore).to.equal(
+      ethers.parseEther("0.01"),
+      "Cannot withdraw"
+    );
+    expect(contractBalanceAfter).to.equal(0, "Cannot withdraw");
+    expect(ownerBalanceAfter).to.greaterThan(
+      ownerBalanceBefore,
+      "Cannot withdraw"
+    );
+  });
+
+  it("Should NOT withdraw (permission)", async function () {
+    const { contract, otherAccount } = await loadFixture(deployFixture);
+
+    const instance = contract.connect(otherAccount);
+
+    await expect(instance.withdraw()).to.be.revertedWith(
+      "You do not have permission"
+    );
+  });
+
+  it("Should has URI metadata", async function () {
+    const { contract } = await loadFixture(deployFixture);
+
+    await contract.mint(0, { value: ethers.parseEther("0.01") });
+
+    const uri = await contract.uri(0);
+
+    expect(uri).to.equal(
+      "ipfs://QmZymW65mbp4MD35FSb4K9Y4vLMVAZEtWnygwU24X4MD8T/0.json",
+      "Does not have URI"
+    );
+  });
+
+  it("Should NOT has URI metadata", async function () {
+    const { contract } = await loadFixture(deployFixture);
+
+    await expect(contract.uri(10)).to.be.revertedWith(
+      "This token does not exist"
+    );
+  });
 });
