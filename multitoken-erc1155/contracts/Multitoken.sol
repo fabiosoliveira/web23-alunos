@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.20;
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
-import "@openzeppelin/contracts/utils/String.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Multitoken is ERC1155, ERC1155Burnable {
 
@@ -28,7 +28,7 @@ contract Multitoken is ERC1155, ERC1155Burnable {
 
     function mint(uint256 id) external payable {
         require(id < 3, "This token does not exist");
-        require(msg.value >= tokenPrice, "Insuficient payment");
+        require(msg.value >= tokenPrice, "Insufficient payment");
         require(currentSupply[id] > 0, "Max supply reached");
 
         _mint(msg.sender, id, 1, "");

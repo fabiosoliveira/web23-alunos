@@ -19,8 +19,98 @@ describe("Multitoken", function () {
     return { contract, owner, otherAccount };
   }
 
-  it("Should ...", async function () {
-    // const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
-    // expect(await lock.unlockTime()).to.equal(unlockTime);
+  it("Should mint", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await contract.mint(0, { value: ethers.parseEther("0.01") });
+
+    const balance = await contract.balanceOf(owner.address, 0);
+    const supply = await contract.currentSupply(0);
+
+    expect(balance).to.equal(1, "Cannot mint");
+    expect(supply).to.equal(49, "Cannot mint");
+  });
+
+  it("Should NOT mint (exists)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await expect(
+      contract.mint(3, { value: ethers.parseEther("0.01") })
+    ).to.be.revertedWith("This token does not exist");
+  });
+
+  it("Should NOT mint (payment)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await expect(
+      contract.mint(0, { value: ethers.parseEther("0.001") })
+    ).to.be.revertedWith("Insufficient payment");
+  });
+
+  it("Should NOT mint (supply)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    for (let i = 0; i < 50; i++) {
+      await contract.mint(0, { value: ethers.parseEther("0.01") });
+    }
+
+    await expect(
+      contract.mint(0, { value: ethers.parseEther("0.01") })
+    ).to.be.revertedWith("Max supply reached");
+  });
+
+  it("Should burn", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await contract.mint(0, { value: ethers.parseEther("0.01") });
+    await contract.burn(owner.address, 0, 1);
+
+    const balance = await contract.balanceOf(owner.address, 0);
+    const supply = await contract.currentSupply(0);
+
+    expect(balance).to.equal(0, "Cannot burn");
+    expect(supply).to.equal(49, "Cannot burn");
+  });
+
+  it("Should burn (approved)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await contract.mint(0, { value: ethers.parseEther("0.01") });
+
+    await contract.setApprovalForAll(otherAccount.address, true);
+    const approved = await contract.isApprovedForAll(
+      owner.address,
+      otherAccount.address
+    );
+
+    const instance = contract.connect(otherAccount);
+    await instance.burn(owner.address, 0, 1);
+
+    const balance = await contract.balanceOf(owner.address, 0);
+    const supply = await contract.currentSupply(0);
+
+    expect(balance).to.equal(0, "Cannot burn (approved)");
+    expect(supply).to.equal(49, "Cannot burn (approved)");
+    expect(approved).to.equal(true, "Cannot burn (approved)");
+  });
+
+  it("Should NOT burn (balance)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await expect(
+      contract.burn(owner.address, 0, 1)
+    ).to.be.revertedWithCustomError(contract, "ERC1155InsufficientBalance");
+  });
+
+  it("Should NOT burn (permission)", async function () {
+    const { contract, owner, otherAccount } = await loadFixture(deployFixture);
+
+    await contract.mint(0, { value: ethers.parseEther("0.01") });
+
+    const instance = contract.connect(otherAccount);
+
+    await expect(
+      instance.burn(owner.address, 0, 1)
+    ).to.be.revertedWithCustomError(contract, "ERC1155MissingApprovalForAll");
   });
 });
