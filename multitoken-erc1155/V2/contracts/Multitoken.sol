@@ -28,10 +28,10 @@ contract Multitoken is Initializable, ERC1155Upgradeable, ERC1155BurnableUpgrade
         _disableInitializers();
     }
 
-    function initialize(address initialOwner) initializer public {
+    function initialize() initializer public {
         __ERC1155_init(BASE_URL);
         __ERC1155Burnable_init();
-        __Ownable_init(initialOwner);
+        __Ownable_init(msg.sender);
         __ERC1155Supply_init();
         tokenPrice = 0.01 ether;
         maxSupply = 50;
@@ -39,7 +39,7 @@ contract Multitoken is Initializable, ERC1155Upgradeable, ERC1155BurnableUpgrade
 
     function mint(uint256 id) external payable {
         require(id < 3, "This token does not exist");
-        require(msg.value >= tokenPrice, "Insufficient payment");
+        require(msg.value >= 0.02 ether, "Insufficient payment");
         require(totalSupply(id) < maxSupply, "Max supply reached");
 
         _mint(msg.sender, id, 1, "");
@@ -64,5 +64,9 @@ contract Multitoken is Initializable, ERC1155Upgradeable, ERC1155BurnableUpgrade
         address payable recipient = payable(owner());
         (bool success, ) = recipient.call{value: amount}("");
         require(success == true, "Failed to withdraw");
+    }
+
+    function test() external pure returns (string memory) {
+        return "Hello, world!";
     }
 }

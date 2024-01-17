@@ -11,7 +11,7 @@ describe("Multitoken", function () {
     const [owner, otherAccount] = await ethers.getSigners();
 
     const _Multitoken = await ethers.getContractFactory("Multitoken");
-    const contract = await upgrades.deployProxy(_Multitoken, [owner.address]);
+    const contract = await upgrades.deployProxy(_Multitoken);
     const contractAddress = await contract.getAddress();
 
     return { contract, contractAddress, owner, otherAccount };

@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "npx hardhat coverage",
-    "compile": "npx hardhat compile"
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy.ts --network mumbai",
+    "verify": "npx hardhat verify 0x653c1260c4a3cbf45043cd0cdaf1ea2a1a68730d --network mumbai",
+    "update": "npx hardhat run scripts/update.ts --network mumbai"
   },
   "keywords": [],
   "author": "",
