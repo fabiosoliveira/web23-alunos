@@ -5,13 +5,12 @@ pragma solidity ^0.8.20;
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract NFTMarket {
+contract NFTMarket is ReentrancyGuard {
 
-    using Counter for Counters.Counter;
-    Counters.Counter uint private _itemIds;
-    Counters.Counter uint private _itemsSold;
+    uint private _itemIds;
+    uint private _itemsSold;
 
     address payable owner;
     uint public listingPrice = 0.025 ether;
@@ -40,16 +39,15 @@ contract NFTMarket {
         uint price
     );
 
-    function createMarketItem(address nftContract, uint tokenId, uint price)  public payable {
+    function createMarketItem(address nftContract, uint tokenId, uint price)  public payable nonReentrant {
         require(price > 0, "Price cannot be 0");
         require(msg.value == listingPrice, "Value must be equal to listing price");
 
-        _itemIds.increment();
-        uint itemId = _itemIds.current();
-        marketItem[itemId] = MarketItem(itemId, nftContract, tokenId, payable(msg.sender), payable(address(0)), price, false);
+        _itemIds++;
+        marketItem[_itemIds] = MarketItem(_itemIds, nftContract, tokenId, payable(msg.sender), payable(address(0)), price, false);
 
         IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 
-        emit MarketItemCreated(itemId, nftContract, tokenId, msg.sender, price);
+        emit MarketItemCreated(_itemIds, nftContract, tokenId, msg.sender, price);
     }
 }
