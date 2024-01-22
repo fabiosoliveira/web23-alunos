@@ -7,7 +7,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-contract NFTMarket is ERC721URIStorage {
+contract NFTCollection is ERC721URIStorage {
     
     uint private _tokenIds;
 
@@ -29,7 +29,7 @@ contract NFTMarket is ERC721URIStorage {
         return tokenId;
     }
 
-    function setApprovalForAll(address operator, bool approved) public virtual override {
+    function setApprovalForAll(address operator, bool approved) public virtual override(ERC721, IERC721) {
         require(_msgSender() == owner || operator != contractAddress || approved, "Cannot remove marketplace approval");
 
         _setApprovalForAll(_msgSender(), operator, approved);
