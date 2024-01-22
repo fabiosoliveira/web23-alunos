@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx hardhat coverage"
+    "test": "npx hardhat coverage",
+    "deploy": "npx hardhat run scripts/deploy.ts --network mumbai",
+    "verify:NFTMarket": "npx hardhat verify --network mumbai 0xf228B4c5c4AaAc700445d2334dc9c131181D9991",
+    "verify:NFTCollection": "npx hardhat verify --network mumbai 0x51266dA6B9BF1BF66a7665e89F83A67344474Ae3 '0xf228B4c5c4AaAc700445d2334dc9c131181D9991'"
   },
   "keywords": [],
   "author": "",
