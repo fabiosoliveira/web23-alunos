@@ -1,10 +1,39 @@
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { FormCreate } from "./form_create";
 
 export default function Create() {
   return (
     <>
-      <Header />
+      <main>
+        <section className="bg-secondary-500 poster pt-4 relative text-opacity-60 text-white sm:px-4">
+          <Header />
+        </section>
+        <section className="bg-opacity-10 bg-primary-500 py-24 sm:px-4">
+          <div className="container mx-auto px-4">
+            <div className="-mx-4 flex flex-wrap gap-2 items-center mb-6">
+              <div className="px-4 w-full md:flex-1">
+                <h2 className="capitalize font-bold text-3xl text-gray-900">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    width="1.25em"
+                    height="1.25em"
+                    className="inline-block mb-2 mr-2 text-primary-500"
+                  >
+                    <path d="M12 23a7.5 7.5 0 0 1-5.138-12.963C8.204 8.774 11.5 6.5 11 1.5c6 4 9 8 3 14 1 0 2.5 0 5-2.47.27.773.5 1.604.5 2.47A7.5 7.5 0 0 1 12 23z"></path>
+                  </svg>
+                  <span>Create NFT</span>
+                </h2>
+              </div>
+            </div>
+            <div>
+              <FormCreate />
+            </div>
+          </div>
+        </section>
+      </main>
       <Footer />
     </>
   );
