@@ -179,3 +179,48 @@ export async function uploadAndCreate(nft: NewNFT): Promise<number> {
 
   return itemId;
 }
+
+export async function loadMyNFTs(): Promise<NFT[]> {
+  const provider = await getProvider();
+  const signer = await provider.getSigner();
+
+  const marketContract = new ethers.Contract(
+    MARKETPLACE_ADDRESS,
+    NFTMarketABI,
+    provider
+  );
+  const collectionContract = new ethers.Contract(
+    COLLECTION_ADDRESS,
+    NFTCollectionABI,
+    provider
+  );
+
+  const data = await marketContract.fetchMyNFTs({ from: signer.address });
+  if (!data || !data.length) return [];
+
+  const items = await Promise.all(
+    data.map(async (item: NFT) => {
+      const tokenUri = await collectionContract.tokenURI(item.tokenId);
+      const metadata = await axios.get(
+        tokenUri.replace("ipfs://", "https://gateway.pinata.cloud/ipfs/")
+      );
+      const price = ethers.formatUnits(item.price.toString(), "ether");
+
+      return {
+        price,
+        itemId: item.itemId,
+        tokenId: item.tokenId,
+        seller: item.seller,
+        owner: item.owner,
+        image: metadata.data.image.replace(
+          "ipfs://",
+          "https://gateway.pinata.cloud/ipfs/"
+        ),
+        name: metadata.data.name,
+        description: metadata.data.description,
+      } as NFT;
+    })
+  );
+
+  return items;
+}
