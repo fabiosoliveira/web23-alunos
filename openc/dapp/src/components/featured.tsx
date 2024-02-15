@@ -1,4 +1,5 @@
 import { NFT } from "@/app/services/Web3Service";
+import Link from "next/link";
 
 type Props = {
   nft?: NFT;
@@ -11,7 +12,7 @@ export function Featured(props: Props) {
   return (
     <div className="px-4 w-full lg:w-6/12 xl:w-5/12">
       <div className="-ml-4 bg-secondary-500 p-4 rounded-2xl w-10/12 sm:-ml-6 sm:p-6 md:w-7/12 lg:w-full">
-        <a
+        <Link
           href={props.nft ? "/details/" + props.nft.itemId : "#"}
           className="block group overflow-hidden relative rounded-xl"
         >
@@ -30,7 +31,7 @@ export function Featured(props: Props) {
               by {props.nft ? props.nft.description : "Loading..."}
             </span>
           </div>
-        </a>
+        </Link>
       </div>
     </div>
   );
