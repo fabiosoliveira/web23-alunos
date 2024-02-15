@@ -59,6 +59,70 @@ async function getProvider() {
   return provider;
 }
 
+export type NFT = {
+  itemId: number;
+  tokenId: number;
+  price: bigint | string;
+  seller: string;
+  owner: string;
+  image: string;
+  name: string;
+  description: string;
+};
+
+export async function loadDetails(itemId: number): Promise<NFT> {
+  const provider = await getProvider();
+  const marketContract = new ethers.Contract(
+    MARKETPLACE_ADDRESS,
+    NFTMarketABI,
+    provider
+  );
+  const collectionContract = new ethers.Contract(
+    COLLECTION_ADDRESS,
+    NFTCollectionABI,
+    provider
+  );
+
+  const item: NFT = await marketContract.marketItems(itemId);
+  if (!item) return {} as NFT;
+
+  const tokenUri = await collectionContract.tokenURI(item.tokenId);
+  const metadata = await axios.get(
+    tokenUri.replace("ipfs://", "https://gateway.pinata.cloud/ipfs/")
+  );
+  const price = ethers.formatUnits(item.price.toString(), "ether");
+
+  return {
+    price,
+    itemId: item.itemId,
+    tokenId: item.tokenId,
+    seller: item.seller,
+    owner: item.owner,
+    image: metadata.data.image.replace(
+      "ipfs://",
+      "https://gateway.pinata.cloud/ipfs/"
+    ),
+    name: metadata.data.name,
+    description: metadata.data.description,
+  } as NFT;
+}
+
+export async function buyNFT(nft: NFT) {
+  const provider = await getProvider();
+  const signer = await provider.getSigner();
+  const contract = new ethers.Contract(
+    MARKETPLACE_ADDRESS,
+    NFTMarketABI,
+    signer
+  );
+  const price = ethers.parseUnits(nft.price.toString(), "ether");
+
+  const tx = await contract.createMarketSale(COLLECTION_ADDRESS, nft.itemId, {
+    value: price,
+  });
+  await tx.wait();
+}
+
 async function createItem(url: string, price: string): Promise<number> {
   const provider = await getProvider();
   const signer = await provider.getSigner();
