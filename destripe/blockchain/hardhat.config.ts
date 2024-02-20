@@ -6,8 +6,11 @@ import "@nomicfoundation/hardhat-toolbox";
 
 const config: HardhatUserConfig = {
   solidity: "0.8.20",
+  sourcify: {
+    enabled: false,
+  },
   networks: {
-    goerli: {
+    sepolia: {
       url: process.env.INFURA_URL,
       chainId: parseInt(`${process.env.CHAIN_ID}`),
       accounts: {
