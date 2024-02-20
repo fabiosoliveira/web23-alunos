@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.ts --network goerli"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.1",
     "dotenv": "^16.4.4",
