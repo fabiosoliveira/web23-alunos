@@ -5,9 +5,10 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "./INFTCollection.sol";
 //import "hardhat/console.sol";
 
-contract DestripeCollection is ERC721, Ownable {
+contract DestripeCollection is INFTCollection, ERC721, Ownable {
 
     uint256 private _tokenIds;
 
