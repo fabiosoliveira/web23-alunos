@@ -1,0 +1,5 @@
+### GET nfts
+GET http://localhost:3000/nfts/1.json
+
+### GET images
+GET http://localhost:3000/images/1.json
