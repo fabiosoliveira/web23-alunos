@@ -41,7 +41,7 @@ async function registerPrice() {
 }
 
 const streamUrl = binance.websockets.prevDay(
-  "SepoliaETHUSDT",
+  "MATICUSDT",
   async (data: any, converted: TickerData) => {
     lastReceivedPrice = converted.close;
     if (!lastRegisteredPrice) lastRegisteredPrice = lastReceivedPrice;
@@ -72,7 +72,7 @@ async function updateCycle() {
   console.log("Finishing the update cycle...");
 }
 
-//setTimeout(updateCycle, 5000);
+// setTimeout(updateCycle, 5000);
 
 setInterval(updateCycle, MAX_INTERVAL);
 
