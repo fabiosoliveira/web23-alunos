@@ -5,6 +5,9 @@ import Moralis from "moralis";
 
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 
+import { Telegraf } from "telegraf";
+
+const bot = new Telegraf(config.TELEGRAM_BOT);
 
 async function getPrice(): Promise<number> {
     const { result } = await Moralis.EvmApi.token.getTokenPrice({
@@ -15,6 +18,7 @@ async function getPrice(): Promise<number> {
 
     const message = "WETH in USD: " + result.usdPrice;
     console.log(message);
+    await bot.telegram.sendMessage(config.CHAT_ID, message);
 
     return result.usdPrice;
 }
